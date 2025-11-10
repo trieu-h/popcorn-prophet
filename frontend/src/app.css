@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+	--color-dark-blue: #101c22;
+	--color-light-blue: #0F93D4;
+	--color-gray: #f6f7f8;
+	--color-light-gray: #949495;
+	--color-dark-gray: #3F3F46;	
+	--font-sans: "Space Grotesk";
+	--font-mono: "Space Grotesk";
+}
+
+body {
+  min-height: 100vh;
+}
+
