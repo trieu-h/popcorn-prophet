@@ -121,8 +121,11 @@
 
 @theme {
 	--color-light-blue: #0F93D4;
+  --color-light-blue-2: #01b8da;
 	--color-dark-blue: #101c22;
 	--color-dark-blue-2: #113346;
+  --color-dark-blue-3: #0e1924;
+  --color-dark-blue-4: #1c283d;
 	--color-blue-gray: #1E2C35;
 	--color-blue-gray-2: #394A53;
 	--color-gray: #f6f7f8;
