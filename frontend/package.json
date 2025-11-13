@@ -27,8 +27,8 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
+    "chart.js": "^4.5.1",
     "sv-router": "^0.10.4",
-    "svelteplot": "^0.5.3",
     "tailwindcss": "^4.1.17"
   }
 }

@@ -1,10 +1,11 @@
 <script lang="ts">
 	import * as Select from "$lib/components/ui/select/index.js";
 	import * as Card from "$lib/components/ui/card/index.js";
+	import { Chart } from "chart.js/auto";
+	import { onMount, onDestroy } from "svelte";
 
 	//Parameters
-	let parameters: string[] = $state([]);
-	let parameterSelection = $derived(parameters.join(', '));
+	let parameterSelection = $state("Budget");
 	let parameterOptions = ["Budget", "Release Month", "Runtime", "Popularity", "Vote Count", "Vote Average", "Number of Languages", 
 											"Number of Production Companies", "Number of Production Countries"];
 
@@ -14,6 +15,106 @@
 	let genreOptions = ["Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", 
 											"Family", "Fantasy", "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction",
 											"Thriller", "TV Movie", "War", "Western"];
+
+	let chartElem: HTMLCanvasElement;
+	let chartInstance: Chart;
+
+	const data = {
+		datasets: [{
+			label: 'Scatter Dataset',
+			data: [{
+				x: -10,
+				y: 0
+			}, {
+				x: 0,
+				y: 10
+			}, {
+				x: 10,
+				y: 5
+			}, {
+				x: 0.5,
+				y: 5.5
+			}],
+			backgroundColor: '#0F93D4'
+		}],
+	};
+
+	const commonConfig = {
+		border: {
+			color: "#FFFFFF"
+		},
+		ticks: {
+			color: '#FFFFFF'
+		}
+	}
+
+	const config = {
+		type: 'scatter',
+		data: data,
+		options: {
+			plugins: {
+				legend: {
+					display: false
+				},
+				tooltip: {
+					callbacks: {
+						label: function(context: any) {
+							const xLabel = config.options.scales.x.title.text;
+							const yLabel = config.options.scales.y.title.text;
+							const xValue = context.parsed.x;
+							const yValue = context.parsed.y;
+							return `${xLabel}: ${xValue}, ${yLabel}: ${yValue}`;
+						}
+					}
+				}
+			},
+			elements: {
+				point: {
+					radius: 5,
+					hoverRadius: 8
+				}
+			},
+			scales: {
+				x: {
+					type: 'linear',
+					position: 'bottom',
+					title: {
+						text: 'Budget (Millions $)',
+						color: '#FFFFFF',
+						display: true
+					},
+					...commonConfig
+				},
+				y: {
+					title: {
+						text: 'Revenue (Millions $)',
+						color: '#FFFFFF',
+						display: true
+					},
+					...commonConfig
+				}
+			}
+		}
+	};
+
+	onMount(() => {
+		chartElem = document.getElementById("scatter-chart") as HTMLCanvasElement;
+
+		if (chartElem) {
+			chartInstance = new Chart(chartElem, config as any)
+		}
+	})
+
+	onDestroy(() => {
+		if (chartElem) {
+			chartElem.remove();
+		}
+	})
+
+	function onParameterChange(parameter: string) {
+		config.options.scales.x.title.text = parameter;
+		chartInstance.update();
+	}
 </script>
 
 <div class="flex flex-col w-7xl mx-auto pt-10">
@@ -29,7 +130,7 @@
 			<p class="text-white mb-2">
 				Select Parameter
 			</p>
-			<Select.Root type="single" bind:value={parameterSelection}>
+			<Select.Root type="single" bind:value={parameterSelection} onValueChange={onParameterChange}>
 					<Select.Trigger class="w-100">{parameterSelection}</Select.Trigger>
 					<Select.Content>
 						{#each parameterOptions as parameterOption}
@@ -61,8 +162,8 @@
 		</div>
 	</div>
 
-	<div class="bg-dark-blue-3 gap-3 border border-blue-gray-2 rounded-xl flex px-5 py-5 mt-5 h-200 mb-5">
-
+	<div class="bg-dark-blue-3 gap-3 border border-blue-gray-2 rounded-xl flex p-9 mt-5 mb-5">
+		<canvas id="scatter-chart"></canvas>
 	</div>
 
 	<div class="flex justify-between gap-4 mb-5">
