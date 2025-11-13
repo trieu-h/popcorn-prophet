@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as Select from "$lib/components/ui/select/index.js";
-	import * as Card from "$lib/components/ui/card/index.js";
 	import TrendingUpNow from "@lucide/svelte/icons/trending-up-down";
   import { Button } from "$lib/components/ui/button/index.js";
   import { navigate } from "../router";
@@ -32,33 +31,33 @@
 </div>
 
 <div class="w-5xl mx-auto">
-	<Card.Root class="bg-dark-blue-3 gap-3 border-blue-gray-2 flex flex-col">
+	<div class="bg-dark-blue-3 gap-3 border border-blue-gray-2 rounded-xl flex flex-col pt-3 mb-5">
 		<div class="flex pl-5 pt-3">
-			<Card.Content class= "flex-1">
-				<Card.Title class="text-white">Budget</Card.Title>
-			</Card.Content>
-			<Card.Content class= "flex-1">
-				<Card.Title class="text-white">Vote Average (1-10)</Card.Title>
-			</Card.Content>
+			<div class= "flex-1">
+				<p class="text-white">Budget</p>
+			</div>
+			<div class= "flex-1">
+				<p class="text-white">Vote Average (1-10)</p>
+			</div>
 		</div>
 		<div class="flex pl-5 mb-2">
-			<Card.Content class= "flex-1 ">
+			<div class= "flex-1 ">
 				<input class="bg-dark-blue-4 text-white px-3 py-2 w-100 rounded-md border border-blue-gray-2" placeholder="e.g. 15000000" />
-			</Card.Content>
-			<Card.Content class= "flex-1">
+			</div>
+			<div class= "flex-1">
 				<input class="bg-dark-blue-4 text-white px-3 py-2 w-100 rounded-md border border-blue-gray-2" placeholder="e.g. 7.5" />
-			</Card.Content>
+			</div>
 			</div>
 			<div class="flex pl-5">
-			<Card.Content class= "flex-1">
-				<Card.Title class="text-white">Genre(s)</Card.Title>
-			</Card.Content>
-			<Card.Content class= "flex-1">
-				<Card.Title class="text-white">Original Language</Card.Title>
-			</Card.Content>
+			<div class= "flex-1">
+				<p class="text-white">Genre(s)</p>
+			</div>
+			<div class= "flex-1">
+				<p class="text-white">Original Language</p>
+			</div>
 			</div>
 			<div class="flex pl-5 mb-2">
-			<Card.Content class= "flex-1">
+			<div class= "flex-1">
 				<Select.Root type="multiple" bind:value={genres}>
 					<Select.Trigger class="w-100">{genresSelection}</Select.Trigger>
 					<Select.Content>
@@ -67,8 +66,8 @@
 						{/each}
 					</Select.Content>
 				</Select.Root>
-			</Card.Content>
-			<Card.Content class= "flex-1">
+			</div>
+			<div class= "flex-1">
 				<Select.Root type="single" bind:value={languageSelection}>
 					<Select.Trigger class="w-100">{languageOptions[languageSelection]}</Select.Trigger>
 					<Select.Content>
@@ -77,18 +76,18 @@
 						{/each}
 					</Select.Content>
 				</Select.Root>
-			</Card.Content>
+			</div>
 			</div>
 			<div class="flex pl-5">
-			<Card.Content class= "flex-1">
-				<Card.Title class="text-white">Release Month</Card.Title>
-			</Card.Content>
-			<Card.Content class= "flex-1">
-				<Card.Title class="text-white">Number of Languages</Card.Title>
-			</Card.Content>
+			<div class= "flex-1">
+				<p class="text-white">Release Month</p>
+			</div>
+			<div class= "flex-1">
+				<p class="text-white">Number of Languages</p>
+			</div>
 			</div>
 			<div class="flex pl-5 mb-2">
-			<Card.Content class= "flex-1">
+			<div class= "flex-1">
 				<Select.Root type="single" bind:value={monthSelection}>
 					<Select.Trigger class="w-100">{monthOptions[monthSelection]}</Select.Trigger>
 					<Select.Content>
@@ -97,62 +96,62 @@
 						{/each}
 					</Select.Content>
 				</Select.Root>
-			</Card.Content>
-			<Card.Content class= "flex-1">
+			</div>
+			<div class= "flex-1">
 				<input class="bg-dark-blue-4 text-white px-3 py-2 w-100 rounded-md border border-blue-gray-2" placeholder="e.g. 3" />
-			</Card.Content>
+			</div>
 			</div>
 			<div class="flex pl-5">
-			<Card.Content class= "flex-1">
-				<Card.Title class="text-white">Runtime (in Minutes)</Card.Title>
-			</Card.Content>
-			<Card.Content class= "flex-1">
-				<Card.Title class="text-white">Number of Production Companies</Card.Title>
-			</Card.Content>
+			<div class= "flex-1">
+				<p class="text-white">Runtime (in Minutes)</p>
+			</div>
+			<div class= "flex-1">
+				<p class="text-white">Number of Production Companies</p>
+			</div>
 			</div>
 			<div class="flex pl-5 mb-2">
-			<Card.Content class= "flex-1">
+			<div class= "flex-1">
 				<input class="bg-dark-blue-4 text-white px-3 py-2 w-100 rounded-md border border-blue-gray-2" placeholder="e.g. 146" />
-			</Card.Content>
-			<Card.Content class= "flex-1">
+			</div>
+			<div class= "flex-1">
 				<input class="bg-dark-blue-4 text-white px-3 py-2 w-100 rounded-md border border-blue-gray-2" placeholder="e.g. 5" />
-			</Card.Content>
+			</div>
 			</div>
 			<div class="flex pl-5">
-			<Card.Content class= "flex-1">
-				<Card.Title class="text-white">Popularity</Card.Title>
-			</Card.Content>
-			<Card.Content class= "flex-1">
-				<Card.Title class="text-white">Number of Production Countries</Card.Title>
-			</Card.Content>
+			<div class= "flex-1">
+				<p class="text-white">Popularity</p>
+			</div>
+			<div class= "flex-1">
+				<p class="text-white">Number of Production Countries</p>
+			</div>
 			</div>
 			<div class="flex pl-5 mb-2">
-			<Card.Content class= "flex-1">
+			<div class= "flex-1">
 				<input class="bg-dark-blue-4 text-white px-3 py-2 w-100 rounded-md border border-blue-gray-2" placeholder="e.g. 50.5" />
-			</Card.Content>
-			<Card.Content class= "flex-1">
+			</div>
+			<div class= "flex-1">
 				<input class="bg-dark-blue-4 text-white px-3 py-2 w-100 rounded-md border border-blue-gray-2" placeholder="e.g. 4" />
-			</Card.Content>
+			</div>
 			</div>
 			<div class="flex pl-5">
-			<Card.Content class= "flex-1">
-				<Card.Title class="text-white">Vote Count</Card.Title>
-			</Card.Content>
+			<div class= "flex-1">
+				<p class="text-white">Vote Count</p>
+			</div>
 			</div>
 			<div class="flex pl-5 mb-2 pb-3">
-			<Card.Content class= "flex-1">
+			<div class= "flex-1">
 				<input class="bg-dark-blue-4 text-white px-3 py-2 w-100 rounded-md border border-blue-gray-2" placeholder="e.g. 5000" />
-			</Card.Content>
+			</div>
 			</div>
 			<div class="mx-auto items-center">
-				<Card.Content class= "flex-1">
+				<div class= "flex-1 mb-5">
 					<Button variant="blue" onclick={predictNow}>
 						<TrendingUpNow/>
 						Predict Now
 					</Button>
-				</Card.Content>
+				</div>
 			</div>
-	</Card.Root>
+		</div>
 </div>
 
 
