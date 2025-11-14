@@ -8,11 +8,11 @@ import PredictionResult from "./pages/PredictionResult.svelte";
 import Simulation from "./pages/Simulation.svelte";
 
 export const { p, navigate, isActive, route } = createRouter({
-	'/analytics': Analytics,
-	'/analytics/result': AnalyticsResult,
-	'/data-exploration': DataExploration,
-	'/prediction': Prediction,
-	'/prediction/result': PredictionResult,
-	'/prediction/result/simulation': Simulation,
-	'/': Introduction
+	"/analytics": Analytics,
+	"/analytics/result": AnalyticsResult,
+	"/data-exploration": DataExploration,
+	"/prediction": Prediction,
+	"/prediction/result": PredictionResult,
+	"/prediction/result/simulation": Simulation,
+	"/": Introduction
 });

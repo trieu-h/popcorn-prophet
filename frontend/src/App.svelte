@@ -3,6 +3,8 @@
 	import { isActiveLink } from 'sv-router';
 	import logo from './assets/logo.png'
 	import './router.ts';
+
+  const base = import.meta.env.PRODUCTION ? "popcorn-prophet" : undefined;
 </script>
 
 <main>
@@ -20,6 +22,6 @@
 			</div>
 		</header>
 
-		<Router></Router>
+		<Router base={base}></Router>
 </main>
 
