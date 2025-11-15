@@ -4,7 +4,7 @@
   import logo from './assets/logo.png'
   import './router.ts';
 
-  const base = import.meta.env.PRODUCTION ? "popcorn-prophet" : undefined;
+  const base = import.meta.env.PROD ? "popcorn-prophet" : undefined;
 </script>
 
 <main>

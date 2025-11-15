@@ -5,7 +5,7 @@ import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  const base = mode === 'production' ? "/popcorn-prophet/" : undefined;
+  const base = mode === 'production' ? "/popcorn-prophet" : undefined;
 
   return {
     plugins: [svelte(), tailwindcss()],
