@@ -36,19 +36,19 @@
   <div class="flex justify-between gap-4 mb-12">
     <Card.Root class="flex-1 bg-blue-gray gap-4 border-blue-gray-2">
       <Card.Header>
-        <Card.Title class="text-white">Base Prediction</Card.Title>
+        <Card.Title class="text-white">Actual Box Office Revenue</Card.Title>
       </Card.Header>
       <Card.Content>
         <p class="text-white text-4xl font-extrabold">$150M</p>
       </Card.Content>
       <Card.Footer>
-        <p class="text-gray-2 text-sm">Industry average starting point</p>
+        <p class="text-gray-2 text-sm">Actual revenue at the time of the release</p>
       </Card.Footer>
     </Card.Root>  
 
     <Card.Root class="flex-1 bg-dark-blue-2 border border-light-blue gap-4">
       <Card.Header>
-        <Card.Title class="text-white">Predictied Box Office Revenue</Card.Title>
+        <Card.Title class="text-white">Predicted Box Office Revenue</Card.Title>
       </Card.Header>
       <Card.Content>
         <p class="text-white text-4xl font-extrabold">$825M</p>
