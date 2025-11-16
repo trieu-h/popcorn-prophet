@@ -1,3 +1,4 @@
 .ipynb_checkpoints
 data-analysis/movie.csv
 frontend/node_modules
+.DS_Store
