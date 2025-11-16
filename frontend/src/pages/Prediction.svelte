@@ -33,12 +33,12 @@
     <div class="flex gap-4"> 
       <div class="flex-1 flex flex-col gap-2">
         <label class="text-white">Budget</label> 
-        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2" placeholder="e.g. 15000000" />
+        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2 w-full" placeholder="e.g. 15000000" />
       </div>
 
       <div class="flex-1 flex flex-col gap-2">
         <label class="text-white">Vote Average (1-10)</label>
-        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2" placeholder="e.g. 7.5" />
+        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2 w-full" placeholder="e.g. 7.5" />
       </div>
     </div>
 
@@ -83,44 +83,40 @@
 
       <div class="flex-1 flex flex-col gap-2">
         <label class="text-white">Number of Languages</label> 
-        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2" placeholder="e.g. 146" />
+        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2 w-full" placeholder="e.g. 146" />
       </div>
     </div>
 
     <div class="flex gap-4">
       <div class="flex-1 flex flex-col gap-2">
         <label class="text-white">Runtime (mins)</label> 
-        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2" placeholder="e.g. 50.5" />
+        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2 w-full" placeholder="e.g. 50.5" />
       </div>
 
       <div class="flex-1 flex flex-col gap-2">
         <label class="text-white">Number of Production Companies</label> 
-        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2" placeholder="e.g. 5" />
+        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2 w-full" placeholder="e.g. 5" />
       </div>
     </div>
     
     <div class="flex gap-4">
       <div class="flex-1 flex flex-col gap-2">
         <label class="text-white">Popularity</label> 
-        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2" placeholder="e.g. 50.5" />
+        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2 w-full" placeholder="e.g. 50.5" />
       </div>
 
       <div class="flex-1 flex flex-col gap-2">
         <label class="text-white">Number of Production Countries</label> 
-        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2" placeholder="e.g. 4" />
+        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2 w-full" placeholder="e.g. 4" />
       </div>
     </div>
 
     <div class="flex gap-4">
       <div class="flex-1 flex flex-col gap-2">
         <label class="text-white">Vote Count</label> 
-        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2" placeholder="e.g. 5000" />
+        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2 w-full" placeholder="e.g. 5000" />
       </div>
-
-      <div class="flex-1 flex flex-col gap-2">
-        <label class="text-white">Vote Average (1-10)</label>
-        <input class="bg-dark-blue-4 text-white h-9 px-3 py-2 rounded-md border border-blue-gray-2" placeholder="e.g. 7.5" />
-      </div>
+      <div class="flex-1 flex flex-col gap-2"></div>
     </div>
 
     <Button variant="blue" onclick={predictNow} class="w-fit self-center">
