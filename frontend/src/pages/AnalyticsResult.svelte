@@ -33,8 +33,8 @@
     </Command.Root>
   </div>
 
-  <div class="flex justify-between gap-4 mb-12">
-    <Card.Root class="flex-1 bg-blue-gray gap-4 border-blue-gray-2">
+  <div class="flex flex-col md:flex-row justify-between gap-4 mb-12">
+    <Card.Root class="flex-1 bg-blue-gray gap-4 border-blue-gray-2 min-w-0">
       <Card.Header>
         <Card.Title class="text-white">Actual Box Office Revenue</Card.Title>
       </Card.Header>
@@ -46,7 +46,7 @@
       </Card.Footer>
     </Card.Root>  
 
-    <Card.Root class="flex-1 bg-dark-blue-2 border border-light-blue gap-4">
+    <Card.Root class="flex-1 bg-dark-blue-2 border border-light-blue gap-4 min-w-0">
       <Card.Header>
         <Card.Title class="text-white">Predicted Box Office Revenue</Card.Title>
       </Card.Header>

@@ -18,7 +18,7 @@
 	let languageOptions: Record<string, string> = { "en": "English", "fr": "French", "ru": "Russian", "es": "Spanish", "ja": "Japanese", "hi": "Hindi", "others": "Others" };
 </script>
 
-<div class="flex flex-col w-7xl mx-auto pt-10 px-6">
+<div class="flex flex-col mx-auto pt-10 px-6 max-w-7xl">
   <div class="flex justify-between mb-7">
 	  <div>
 		  <h1 class="text-white text-3xl font-bold pb-2">Box Office Scenario Simulator</h1>
@@ -26,7 +26,7 @@
 	  </div>
   </div>
 
-  <div class="flex justify-between gap-4 mb-5">
+  <div class="flex flex-col md:flex-row justify-between gap-6 mb-5">
     <div class="bg-dark-blue-3 border border-blue-gray-2 rounded-xl flex flex-col flex-7/20 p-5">
       <div class="flex justify-between items-center mb-5">
         <h1 class="text-2xl text-white font-bold">Adjust Variables</h1>
@@ -38,13 +38,13 @@
 
       <div class="flex flex-col gap-2 mb-6">
         <label class="text-white">Budget ($)</label>
-        <input class="bg-dark-blue-4 text-white px-3 py-2 w-100 rounded-md border border-blue-gray-2"/>
+        <input class="bg-dark-blue-4 text-white px-3 py-2 w-full rounded-md border border-blue-gray-2"/>
       </div>
 
       <div class="flex flex-col gap-2 mb-6">
         <label class="text-white">Genre(s)</label>
         <Select.Root type="multiple" bind:value={genres}>
-          <Select.Trigger class="w-100">{genresSelection}</Select.Trigger>
+          <Select.Trigger class="w-full">{genresSelection}</Select.Trigger>
           <Select.Content>
             {#each genreOptions as genreOption}
               <Select.Item value={genreOption}>{genreOption}</Select.Item>
@@ -56,7 +56,7 @@
       <div class="flex flex-col gap-2 mb-6">
         <label class="text-white">Release Month</label>
         <Select.Root type="single" bind:value={monthSelection}>
-          <Select.Trigger class="w-100">{monthOptions[monthSelection]}</Select.Trigger>
+          <Select.Trigger class="w-full">{monthOptions[monthSelection]}</Select.Trigger>
           <Select.Content>
             {#each Object.entries(monthOptions) as [monthValue, monthLabel]}
               <Select.Item value={monthValue}>{monthLabel}</Select.Item>
@@ -89,7 +89,7 @@
       <div class="flex flex-col gap-2 mb-6">
         <label class="text-white">Original Language</label>
         <Select.Root type="single" bind:value={languageSelection}>
-          <Select.Trigger class="w-100">{languageOptions[languageSelection]}</Select.Trigger>
+          <Select.Trigger class="w-full">{languageOptions[languageSelection]}</Select.Trigger>
           <Select.Content>
             {#each Object.entries(languageOptions) as [languageValue, languageLabel]}
               <Select.Item value={languageValue}>{languageLabel}</Select.Item>
@@ -114,8 +114,7 @@
       </div>
     </div>
 
-    <div class="flex-13/20 px-5 py-3">
-      <p class="text-white font-bold pl-2 mb-5">Predicted Outcome</p>
+    <div class="flex-13/20">
       <div class="bg-dark-blue-3 border border-blue-gray-2 rounded-xl p-7 mb-7">
         <p class="text-gray-2 mb-3">Predicted Worldwide Box Office</p>
         <div class="flex gap-2">
