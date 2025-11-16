@@ -52,6 +52,8 @@
     type: 'scatter',
     data: data,
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: {
           display: false
@@ -115,6 +117,7 @@
     config.options.scales.x.title.text = parameter;
     chartInstance.update();
   }
+
 </script>
 
 <div class="flex flex-col max-w-7xl mx-auto pt-10 px-6">
@@ -157,16 +160,17 @@
   </div>
 
   <div class="bg-dark-blue-3 gap-3 border border-blue-gray-2 rounded-xl flex p-9 mt-5 mb-5">
-    <canvas id="scatter-chart"></canvas>
+    <div class="min-h-100 w-full">
+      <canvas id="scatter-chart"></canvas>
+    </div>
   </div>
 
-  <div class="flex justify-between gap-4 mb-5">
+  <div class="flex justify-between gap-4 mb-5 flex-col md:flex-row">
     <Card.Root class="flex-1 bg-dark-blue-3 gap-4 border-blue-gray-2">
       <Card.Header>
         <Card.Title class="text-light-gray">Movies</Card.Title>
       </Card.Header>
-      <Card.Content>
-        <p class="text-4xl font-extrabold text-white">15</p>
+      <Card.Content> <p class="text-4xl font-extrabold text-white">15</p>
       </Card.Content>
     </Card.Root>  
 
