@@ -114,7 +114,7 @@
       </div>
     </div>
 
-    <div class="flex-13/20">
+    <div class="flex-13/20 flex flex-col">
       <div class="bg-dark-blue-3 border border-blue-gray-2 rounded-xl p-7 mb-7">
         <p class="text-gray-2 mb-3">Predicted Worldwide Box Office</p>
         <div class="flex gap-2">
@@ -125,9 +125,9 @@
           </div>	
         </div>
       </div>
-      <div class="bg-dark-blue-3 border border-blue-gray-2 rounded-xl flex flex-col flex-7/20 p-7">
+      <div class="bg-dark-blue-3 border border-blue-gray-2 rounded-xl flex flex-col flex-1 p-7">
         <p class="text-white font-bold mb-3">Original vs. Simulated Revenue</p>
-        <div class="flex text-white h-100">
+        <div class="flex text-white h-full">
           <div class="flex flex-col flex-1 bg-blue items-center h-full">
             <div class="flex-1 flex flex-col">
               <div class="w-20 bg-blue-gray-2 h-3/4 mt-auto rounded-t-lg">
