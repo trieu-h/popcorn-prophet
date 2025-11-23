@@ -1,7 +1,9 @@
 .ipynb_checkpoints
-data-analysis/movie.csv
+*.csv
+*.db
 frontend/node_modules
 .DS_Store
 backend/.venv
 backend/__pycache__
+
 
