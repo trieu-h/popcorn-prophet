@@ -9,7 +9,7 @@ import Simulation from "./pages/Simulation.svelte";
 
 export const { p, navigate, isActive, route } = createRouter({
 	"/analytics": Analytics,
-	"/analytics/result": AnalyticsResult,
+	"/analytics/result/:movie_id": AnalyticsResult,
 	"/data-exploration": DataExploration,
 	"/prediction": Prediction,
 	"/prediction/result": PredictionResult,

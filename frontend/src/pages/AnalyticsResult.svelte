@@ -1,36 +1,89 @@
 <script lang="ts">
-  import * as Command from "$lib/components/ui/command/index.js";
+  import { onDestroy, onMount } from "svelte";
+  import { route, navigate } from "../router";
+  import ArrowLeft from "@lucide/svelte/icons/arrow-left";
   import * as Card from "$lib/components/ui/card/index.js";
-  const movies: string[] = [];
-  let empty = false;
-  function onMovieSelection() {
-    console.error("Not implemented yet lol");
+  import { Button } from "$lib/components/ui/button/index.js";
+  import type { Movie } from "src/types/types";
+  import { POSTER_PREFIX } from "../const/const";
+
+  let movie = $state<Movie>();
+  let backdrop_dom_node: HTMLDivElement | null = null;
+
+  function back_to_search_page() {
+    navigate("/analytics", { state: 'navigateFromResult', viewTransition: true });
+  }
+
+  onMount(async () => {
+    const res = await fetch(`http://localhost:8000/movies/${route.params.movie_id}`)
+    movie = await res.json();
+
+    const main = document.body.querySelector('div#app main');
+    backdrop_dom_node = document.createElement('div');
+    backdrop_dom_node.style = `position: absolute; width: 100%; height: 300px; z-index: -1`;
+    const imgElem: HTMLImageElement = document.createElement('img');
+    imgElem.src = `${POSTER_PREFIX}${movie?.backdrop_path}`;
+    imgElem.style = `height: 100%; width: 100%; object-fit: cover; opacity: 0; transition: opacity .75s cubic-bezier(.165,.84,.44,1)`;
+    if (imgElem.complete) {
+      imgElem.style.opacity = "0.2";
+    } else {
+      imgElem.addEventListener('load', () => {
+        imgElem.style.opacity = "0.2";
+      });
+    }
+    backdrop_dom_node.insertAdjacentElement('afterbegin', imgElem);
+    main?.insertAdjacentElement('afterbegin', backdrop_dom_node);
+  })
+
+  onDestroy(() => {
+    backdrop_dom_node?.remove();
+  })
+
+  const number_formatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+
+  const extract_release_year = (date: string) => date?.split("-")[0];
+
+  const reformat_date = (date: string | null) => {
+    if (!date) return '';
+    const [y, m, d] = date.split("-");
+    return `${m}/${d}/${y}`;
+  }
+
+  const reformat_time = (time: number | null) => {
+    if (!time) return '';
+    const h = Math.floor(time / 60);
+    const m = time % 60;
+    let str = '';
+    if (h > 0) str += `${h}h `;
+    if (m > 0) str += `${m}m`;
+    return str;
   }
 </script>
 
 <div class="flex flex-col max-w-7xl mx-auto pt-10 px-6">
   <div class="flex justify-between mb-3">
-    <div>
-      <h1 class="text-white text-3xl font-bold pb-2">Prediction Analysis</h1>
-      <p class="text-gray-2 pb-7">Search for a movie to see its prediction explainability</p>
-    </div>
-'
-    <Command.Root class="w-100">
-      <Command.Input placeholder="Search for a movie title"/>
-      <Command.List>
-        {#if empty}
-          <Command.Empty>No results found.</Command.Empty>
-        {/if}
+    <Button variant="ghost" onclick={back_to_search_page} class="text-white">
+      <ArrowLeft/>
+      Back to Search page
+    </Button>
+  </div>
 
-        {#if movies.length}
-          <Command.Group heading="Movie title">
-            {#each movies as movie}
-              <Command.Item onclick={onMovieSelection}>{movie}</Command.Item>
-            {/each}
-          </Command.Group>
-        {/if}
-      </Command.List>
-    </Command.Root>
+  <h1 class="text-white text-center text-3xl font-bold pb-2 mb-3">Prediction Analysis</h1>
+
+  <div class="flex mb-6 gap-3 bg-blue-gray border border-blue-gray-2 p-6 rounded-xl">
+    <div class="h-60 w-40">
+      <img src={POSTER_PREFIX + movie?.poster_path} class="object-contain" id="poster" alt="movie poster">
+    </div>
+    <div class="flex-7 text-white flex flex-col gap-3">
+        <h1 class="text-2xl font-bold">{movie?.original_title} <span class="text-gray-2">({extract_release_year(movie?.release_date as string)})</span></h1>
+        <div class="flex text-sm">
+          <span>{reformat_date(movie?.release_date as string)} ({movie?.original_language.toUpperCase()})</span>
+          <span class="pl-6 relative before:content-['•'] before:absolute before:left-2">{movie?.genres}</span>
+          <span class="pl-6 relative before:content-['•'] before:absolute before:left-2">{reformat_time(movie?.runtime as number)}</span>
+        </div>
+        <h3 class="text-xl font-bold">Overview</h3>
+        <p>{movie?.overview}</p>
+    </div>
   </div>
 
   <div class="flex flex-col md:flex-row justify-between gap-4 mb-12">
@@ -39,7 +92,7 @@
         <Card.Title class="text-white">Actual Box Office Revenue</Card.Title>
       </Card.Header>
       <Card.Content>
-        <p class="text-white text-4xl font-extrabold">$150M</p>
+        <p class="text-white text-4xl font-extrabold">{number_formatter.format(movie?.revenue as number)}</p>
       </Card.Content>
       <Card.Footer>
         <p class="text-gray-2 text-sm">Actual revenue at the time of the release</p>
@@ -94,4 +147,9 @@
   </div>
 </div>
 
+<style>
+  #poster {
+    view-transition-name: poster;
+  }
+</style>
 

@@ -17,7 +17,7 @@ app.add_middleware(
 )
 
 @app.get("/movies")
-async def get_movies(title:str = "", last_id: int | None = None):
+async def get_movies(title:str = "", last_id: int | None = None, id: int | None = None):
     title = title.strip()
     if title == "":
         return []
@@ -27,8 +27,12 @@ async def get_movies(title:str = "", last_id: int | None = None):
     else:
         res = cursor.execute("SELECT * FROM movies WHERE title LIKE ? LIMIT 12", ('%'+title+'%', ));
 
-    result = res.fetchall();
-    return result
+    return res.fetchall()
+
+@app.get("/movies/{movie_id}")
+async def get_movie_by_id(movie_id: int):
+    res = cursor.execute("SELECT * FROM movies WHERE id = ?", (movie_id, ))
+    return res.fetchone()
 
 @app.get("/predict")
 async def make_prediction():

@@ -3,19 +3,37 @@
   import { Command, CommandInput } from "$lib/components/ui/command";
   import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card"
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
-  import { navigate } from "../router";
+  import { navigate, route } from "../router";
+  import { POSTER_PREFIX } from "../const/const";
+  import { onDestroy } from "svelte";
 
-  const poster_prefix = "https://image.tmdb.org/t/p/original/";
   let movies: Movie[] = $state([]);
   let search_string = $state("");
   let is_loading = $state(false);
   let last_movie_id_state: number | null = null;
 
   let timeout: number | null = null;
-  const cooldown = 1000;
+  const cooldown = 350;
 
-  function on_movie_selection() {
-    navigate('/analytics/result');
+  if (route.state === 'navigateFromResult' && localStorage.getItem("states")) {
+    const states = JSON.parse(localStorage.getItem("states")!);
+    search_string = states.search_string;
+    movies = states.movies;
+    last_movie_id_state = states.last_movie_id_state;
+  }
+
+  const beforeUnloadListener = () => {
+    localStorage.removeItem("states");
+  }
+  window.addEventListener("beforeunload", beforeUnloadListener)
+
+  function on_movie_selection(e: PointerEvent, movie: Movie) {
+    let target = e.target as HTMLElement;
+    target = target instanceof HTMLImageElement ? target : target.querySelector('img')!;
+    target.style.viewTransitionName = "poster";
+
+    localStorage.setItem("states", JSON.stringify({ search_string, movies, last_movie_id_state }));
+    navigate('/analytics/result/:movie_id', { params: { movie_id: movie.id.toString() }, viewTransition: true });
   }
 
   async function on_input_change() {
@@ -46,10 +64,16 @@
     last_movie_id_state = movies.length ? movies[movies.length - 1].id : null;
   }
 
-  window.addEventListener("scroll", () => {
+  const scrollListener = () => {
     if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight) {
       get_movies(search_string.trim(), last_movie_id_state!);
     }
+  }
+  window.addEventListener("scroll", scrollListener);
+
+  onDestroy(() => {
+    window.removeEventListener("scroll", scrollListener);
+    window.removeEventListener("beforeunload", beforeUnloadListener);
   })
 </script>
 
@@ -82,13 +106,13 @@
     {:else}
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         {#each movies as movie}
-          <Card class="gap-3" onclick={on_movie_selection}>
+          <Card class="gap-3" onclick={(e) => on_movie_selection(e as any, movie)}>
             <CardHeader>
               <CardTitle class="overflow-hidden text-ellipsis whitespace-nowrap">{movie.original_title}</CardTitle>
             </CardHeader>
             <CardContent class="text-center">
               {#if movie.poster_path}
-                <img src={poster_prefix + movie.poster_path} alt="">
+                <img src={POSTER_PREFIX + movie.poster_path} alt="">
               {:else}
                 <p>No poster available</p>
                 <p>(⋟﹏⋞)</p>
@@ -100,3 +124,10 @@
     {/if}
   {/if}
 </div>
+
+<style>
+  /* .poster { */
+  /*   view-transition-name: poster; */
+  /* } */
+</style>
+
