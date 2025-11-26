@@ -4,7 +4,7 @@
   import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card"
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
   import { navigate, route } from "../router";
-  import { POSTER_PREFIX } from "../const/const";
+  import { API_URL, POSTER_PREFIX } from "../const/const";
   import { onDestroy } from "svelte";
 
   let movies: Movie[] = $state([]);
@@ -28,12 +28,21 @@
   window.addEventListener("beforeunload", beforeUnloadListener)
 
   function on_movie_selection(e: PointerEvent, movie: Movie) {
-    let target = e.target as HTMLElement;
-    target = target instanceof HTMLImageElement ? target : target.querySelector('img')!;
-    target.style.viewTransitionName = "poster";
+    let card = e.target as HTMLElement;
+    while (card.getAttribute('data-slot') !== 'card') {
+      card = card.parentElement as HTMLElement;
+    }
+    const poster = card.querySelector('img') as HTMLImageElement;
+    poster.style.viewTransitionName = "poster";
+    const title = card.querySelector("[data-slot='card-header']") as HTMLElement;
+    title.style.viewTransitionName = "title";
 
     localStorage.setItem("states", JSON.stringify({ search_string, movies, last_movie_id_state }));
-    navigate('/analytics/result/:movie_id', { params: { movie_id: movie.id.toString() }, viewTransition: true });
+    navigate('/analytics/result/:movie_id', { 
+      params: { movie_id: movie.id.toString()}, 
+      state: $state.snapshot(movie),
+      viewTransition: true, 
+    });
   }
 
   async function on_input_change() {
@@ -54,7 +63,7 @@
   }
 
   async function get_movies(title: string, last_movie_id?: number) {
-    let url = `http://localhost:8000/movies?title=${title.trim()}`;
+    let url = `${API_URL}/movies?title=${title.trim()}`;
     if (last_movie_id) {
       url = url + `&last_id=${last_movie_id}`
     }
@@ -86,7 +95,7 @@
   </Command>
 
   {#if is_loading}
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
       {#each { length: 4 }}
         <Card class="gap-3 opacity-50">
           <CardHeader>
@@ -104,9 +113,9 @@
     {#if movies.length === 0 && search_string.trim().length !== 0}
       <p class="text-white text-3xl">No movies found (&gt;_&lt;)</p>
     {:else}
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
         {#each movies as movie}
-          <Card class="gap-3" onclick={(e) => on_movie_selection(e as any, movie)}>
+          <Card class="bg-dark-gray-2 hover:bg-blue-gray-2 border-blue-gray-2 hover:border-blue-gray gap-3 text-white hover:cursor-pointer perspective-[1px] translate-z-0 hover:scale-[1.1] duration-0.3 transform transition-transform hover:shadow-lg hover:shadow-cyan-500/50 font-normal hover:font-bold" onclick={(e) => on_movie_selection(e as any, movie)}>
             <CardHeader>
               <CardTitle class="overflow-hidden text-ellipsis whitespace-nowrap">{movie.original_title}</CardTitle>
             </CardHeader>
@@ -124,10 +133,4 @@
     {/if}
   {/if}
 </div>
-
-<style>
-  /* .poster { */
-  /*   view-transition-name: poster; */
-  /* } */
-</style>
 

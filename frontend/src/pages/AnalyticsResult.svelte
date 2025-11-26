@@ -6,18 +6,25 @@
   import { Button } from "$lib/components/ui/button/index.js";
   import type { Movie } from "src/types/types";
   import { POSTER_PREFIX } from "../const/const";
+  import { Skeleton } from "$lib/components/ui/skeleton/index.js";
 
   let movie = $state<Movie>();
   let backdrop_dom_node: HTMLDivElement | null = null;
+  let loading = $state<boolean>(false);
 
   function back_to_search_page() {
     navigate("/analytics", { state: 'navigateFromResult', viewTransition: true });
   }
 
   onMount(async () => {
-    const res = await fetch(`http://localhost:8000/movies/${route.params.movie_id}`)
-    movie = await res.json();
-
+    if (route.state) {
+      movie = route.state as Movie;
+    } else {
+      loading = true;
+      const res = await fetch(`http://localhost:8000/analytics/${route.params.movie_id}`)
+      movie = await res.json();
+      loading = false;
+    }
     const main = document.body.querySelector('div#app main');
     backdrop_dom_node = document.createElement('div');
     backdrop_dom_node.style = `position: absolute; width: 100%; height: 300px; z-index: -1`;
@@ -41,7 +48,10 @@
 
   const number_formatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
-  const extract_release_year = (date: string) => date?.split("-")[0];
+  const extract_release_year = (date: string) => {
+    if (!date) return '';
+    return date.split("-")[0];
+  }
 
   const reformat_date = (date: string | null) => {
     if (!date) return '';
@@ -71,19 +81,28 @@
   <h1 class="text-white text-center text-3xl font-bold pb-2 mb-3">Prediction Analysis</h1>
 
   <div class="flex mb-6 gap-3 bg-blue-gray border border-blue-gray-2 p-6 rounded-xl">
-    <div class="h-60 w-40">
-      <img src={POSTER_PREFIX + movie?.poster_path} class="object-contain" id="poster" alt="movie poster">
-    </div>
-    <div class="flex-7 text-white flex flex-col gap-3">
-        <h1 class="text-2xl font-bold">{movie?.original_title} <span class="text-gray-2">({extract_release_year(movie?.release_date as string)})</span></h1>
-        <div class="flex text-sm">
-          <span>{reformat_date(movie?.release_date as string)} ({movie?.original_language.toUpperCase()})</span>
-          <span class="pl-6 relative before:content-['•'] before:absolute before:left-2">{movie?.genres}</span>
-          <span class="pl-6 relative before:content-['•'] before:absolute before:left-2">{reformat_time(movie?.runtime as number)}</span>
+      <div class="h-60 w-40">
+        <img src={POSTER_PREFIX + movie?.poster_path} class="object-contain" id="poster" alt="movie poster">
+      </div>
+      {#if !loading}
+        <div class="flex-7 text-white flex flex-col gap-3">
+            <h1 class="text-2xl font-bold" id="title">{movie?.original_title} <span class="text-gray-2">({extract_release_year(movie?.release_date as string)})</span></h1>
+            <div class="flex text-sm">
+              <span>{reformat_date(movie?.release_date as string)} ({movie?.original_language.toUpperCase()})</span>
+              <span class="pl-6 relative before:content-['•'] before:absolute before:left-2">{movie?.genres}</span>
+              <span class="pl-6 relative before:content-['•'] before:absolute before:left-2">{reformat_time(movie?.runtime as number)}</span>
+            </div>
+            <h3 class="text-xl font-bold">Overview</h3>
+            <p>{movie?.overview}</p>
         </div>
-        <h3 class="text-xl font-bold">Overview</h3>
-        <p>{movie?.overview}</p>
-    </div>
+      {:else}
+        <div class="flex-7 text-white flex flex-col gap-3">
+            <Skeleton class="h-8 bg-gray-2 w-80 opacity-20"></Skeleton>
+            <Skeleton class="h-6 bg-gray-2 w-100 opacity-20"></Skeleton>
+            <Skeleton class="h-8 bg-gray-2 w-40 opacity-20"></Skeleton>
+            <Skeleton class="h-25 bg-gray-2 w-200 opacity-20"></Skeleton>
+        </div>
+      {/if}
   </div>
 
   <div class="flex flex-col md:flex-row justify-between gap-4 mb-12">
@@ -92,7 +111,11 @@
         <Card.Title class="text-white">Actual Box Office Revenue</Card.Title>
       </Card.Header>
       <Card.Content>
-        <p class="text-white text-4xl font-extrabold">{number_formatter.format(movie?.revenue as number)}</p>
+        {#if !loading}
+          <p class="text-white text-4xl font-extrabold">{number_formatter.format(movie?.revenue as number)}</p>
+        {:else}
+          <Skeleton class="h-10 bg-gray-2 w-60 opacity-20"></Skeleton>
+        {/if}
       </Card.Content>
       <Card.Footer>
         <p class="text-gray-2 text-sm">Actual revenue at the time of the release</p>
@@ -104,7 +127,11 @@
         <Card.Title class="text-white">Predicted Box Office Revenue</Card.Title>
       </Card.Header>
       <Card.Content>
-        <p class="text-white text-4xl font-extrabold">$825M</p>
+        {#if !loading}
+          <p class="text-white text-4xl font-extrabold">{number_formatter.format(movie?.predicted_revenue as number)}</p>
+        {:else}
+          <Skeleton class="h-10 bg-gray-2 w-60 opacity-20"></Skeleton>
+        {/if}
       </Card.Content>
       <Card.Footer>
         <p class="text-gray-2 text-sm">Final calculated prediction</p>
@@ -150,6 +177,9 @@
 <style>
   #poster {
     view-transition-name: poster;
+  }
+  #title {
+    view-transition-name: title;
   }
 </style>
 

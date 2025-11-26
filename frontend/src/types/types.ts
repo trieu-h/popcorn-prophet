@@ -24,4 +24,13 @@ export type Movie = {
   tagline: string;
   vote_average: number;
   vote_count: number;
+  number_of_production_companies: number;
+  number_of_production_countries: number;
+  number_of_spoken_languages: number;
+  release_month: number;
+  predicted_revenue?: number;
+}
+
+export type Prediction {
+  predicted_revenue: number;
 }

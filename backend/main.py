@@ -1,10 +1,15 @@
+from typing import List
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pycaret.regression import load_model, predict_model
 import sqlite3
+import pandas as pd
+from pydantic import BaseModel
 
 conn = sqlite3.connect('movies.db')
 conn.row_factory = sqlite3.Row
 cursor = conn.cursor()
+model = load_model('../data-analysis/et_movie_revenue')
 
 app = FastAPI()
 
@@ -17,7 +22,7 @@ app.add_middleware(
 )
 
 @app.get("/movies")
-async def get_movies(title:str = "", last_id: int | None = None, id: int | None = None):
+async def get_movies(title:str = "", last_id = None):
     title = title.strip()
     if title == "":
         return []
@@ -27,17 +32,49 @@ async def get_movies(title:str = "", last_id: int | None = None, id: int | None 
     else:
         res = cursor.execute("SELECT * FROM movies WHERE title LIKE ? LIMIT 12", ('%'+title+'%', ));
 
-    return res.fetchall()
+    rows = res.fetchall()
 
-@app.get("/movies/{movie_id}")
-async def get_movie_by_id(movie_id: int):
-    res = cursor.execute("SELECT * FROM movies WHERE id = ?", (movie_id, ))
-    return res.fetchone()
+    movies = [dict(row) for row in rows]
+    for movie in movies:
+        res = dict(movie);
+        input_df = pd.DataFrame([res])
+        predictions_df = predict_model(estimator=model, data=input_df)
+        print(predictions_df.iloc[0]['prediction_label'])
+        movie['predicted_revenue'] = predictions_df.iloc[0]['prediction_label']
 
-@app.get("/predict")
-async def make_prediction():
-    result = {
-        "verdict": "Blockbuster",
-        "confidence": "89"
-    }
-    return result
+    return movies
+
+@app.get("/analytics/{movie_id}")
+async def get_analytics_for_move(movie_id: int):
+    exec = cursor.execute("SELECT * FROM movies WHERE id = ?", (movie_id, ))
+    movie = exec.fetchone()
+    res = dict(movie);
+    input_df = pd.DataFrame([res])
+    predictions_df = predict_model(estimator=model, data=input_df)
+    res['predicted_revenue'] = predictions_df.iloc[0]['prediction_label']
+
+    return res
+
+class Movie(BaseModel):
+    budget: int
+    # genres: List[str] = None
+    release_month: int
+    runtime: int
+    popularity: float
+    vote_count: int
+    vote_average: float
+    original_language: str
+    number_of_spoken_languages: int 
+    number_of_production_companies: int
+    number_of_production_countries: int
+
+@app.post("/predict")
+async def predict(movie: Movie):
+    movie_dict = dict(movie);
+    movie_dict['release_date'] = 0
+    movie_dict['genres'] = ""
+    input_df = pd.DataFrame([movie_dict])
+    predictions_df = predict_model(estimator=model, data=input_df)
+    print(predictions_df)
+    print({'predicted_revenue': predictions_df.iloc[0]['prediction_label']})
+    return {'predicted_revenue': predictions_df.iloc[0]['prediction_label']}

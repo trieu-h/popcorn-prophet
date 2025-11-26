@@ -7,7 +7,7 @@
       "dependencies": {
         "@tailwindcss/vite": "^4.1.17",
         "chart.js": "^4.5.1",
-        "sv-router": "^0.10.4",
+        "sv-router": "^0.11.0",
         "tailwindcss": "^4.1.17",
       },
       "devDependencies": {
@@ -287,7 +287,7 @@
 
     "style-to-object": ["style-to-object@1.0.12", "", { "dependencies": { "inline-style-parser": "0.2.6" } }, "sha512-ddJqYnoT4t97QvN2C95bCgt+m7AAgXjVnkk/jxAfmp7EAB8nnqqZYEbMd3em7/vEomDb2LAQKAy1RFfv41mdNw=="],
 
-    "sv-router": ["sv-router@0.10.4", "", { "dependencies": { "esm-env": "^1.2.2" }, "peerDependencies": { "svelte": "^5" }, "bin": { "sv-router": "src/cli/index.js" } }, "sha512-OsEC7fYraXWzUA7lUoi5GEhhZwNaqJYCbr2j2FkCcpSBmeMPQUiDK8NpMc0RL7ecDkUgzzBDKSPuJF1k5s4UvQ=="],
+    "sv-router": ["sv-router@0.11.0", "", { "dependencies": { "esm-env": "^1.2.2" }, "peerDependencies": { "svelte": "^5" }, "bin": { "sv-router": "src/cli/index.js" } }, "sha512-szOT/nBmlgMWA/qKR8MABcL09+Q0SSuPaMzrUm8ON+yM4wJjkweEqPTQ4Z93w+0awkZ2wyshPJNApVc0qJsglg=="],
 
     "svelte": ["svelte@5.43.5", "", { "dependencies": { "@jridgewell/remapping": "^2.3.4", "@jridgewell/sourcemap-codec": "^1.5.0", "@sveltejs/acorn-typescript": "^1.0.5", "@types/estree": "^1.0.5", "acorn": "^8.12.1", "aria-query": "^5.3.1", "axobject-query": "^4.1.0", "clsx": "^2.1.1", "esm-env": "^1.2.1", "esrap": "^2.1.0", "is-reference": "^3.0.3", "locate-character": "^3.0.0", "magic-string": "^0.30.11", "zimmerframe": "^1.1.2" } }, "sha512-HQoZArIewxQVNedseDsgMgnRSC4XOXczxXLF9rOJaPIJkg58INOPUiL8aEtzqZIXNSZJyw8NmqObwg/voajiHQ=="],
 

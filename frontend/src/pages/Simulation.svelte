@@ -18,7 +18,7 @@
 	let languageOptions: Record<string, string> = { "en": "English", "fr": "French", "ru": "Russian", "es": "Spanish", "ja": "Japanese", "hi": "Hindi", "others": "Others" };
 </script>
 
-<div class="flex flex-col mx-auto pt-10 px-6 max-w-7xl">
+<div class="flex flex-col mx-auto pt-10 px-6 max-w-7xl" id="prediction-wrapper">
   <div class="flex justify-between mb-7">
 	  <div>
 		  <h1 class="text-white text-3xl font-bold pb-2">Box Office Scenario Simulator</h1>

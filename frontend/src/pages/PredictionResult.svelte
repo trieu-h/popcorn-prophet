@@ -4,17 +4,38 @@
   import ArrowLeft from "@lucide/svelte/icons/arrow-left";
   import Play from "@lucide/svelte/icons/play";
   import { navigate } from "../router";
+  import { onMount } from "svelte";
+  import { form } from "./states.svelte";
+  import { API_URL } from "../const/const";
+  import type { Prediction } from "src/types/types";
+
+  let projected_revenue = $state<number>();
 
   function backToInput() {
-    navigate('/prediction');
+    const prediction_wrapper = document.querySelector("#prediction-wrapper") as HTMLDivElement;
+    prediction_wrapper.style.viewTransitionName = "prediction-wrapper-back";
+    navigate('/prediction', { viewTransition: true });
   }
 
   function runSimulation() {
-    navigate('/prediction/result/simulation');
+    navigate('/prediction/result/simulation', { viewTransition: true });
   }
+
+  const currency_formatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+
+  onMount(async () => {
+    const res = await fetch(`${API_URL}/predict`, {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form)
+    });
+
+    const prediction_res: Prediction = await res.json();
+    projected_revenue = prediction_res.predicted_revenue;
+  })
 </script>
 
-<div class="flex flex-col max-w-7xl mx-auto pt-10 px-6">
+<div class="flex flex-col max-w-7xl mx-auto pt-10 px-6" id="prediction-wrapper">
   <div class="flex justify-between mb-3">
     <div>
       <h1 class="text-white text-3xl font-bold pb-2">Prediction Result</h1>
@@ -28,7 +49,7 @@
         <Card.Title class="text-white">Projected Revenue</Card.Title>
       </Card.Header>
       <Card.Content>
-        <p class="text-4xl font-extrabold text-light-blue">$150M</p>
+        <p class="text-4xl font-extrabold text-light-blue">{projected_revenue ? currency_formatter.format(projected_revenue) : "-"}</p>
       </Card.Content>
     </Card.Root>  
 
@@ -102,4 +123,8 @@
   </div>
 </div>
 
-
+<style>
+  #prediction-wrapper {
+    view-transition-name: prediction-wrapper;
+  }
+</style>

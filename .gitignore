@@ -1,6 +1,7 @@
 .ipynb_checkpoints
 *.csv
 *.db
+*.log
 frontend/node_modules
 .DS_Store
 backend/.venv
