@@ -5,11 +5,27 @@
   import { navigate } from "../router";
   import { form } from "./states.svelte";
 
-  let genre_options = [
-    "Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", 
-    "Family", "Fantasy", "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction",
-    "Thriller", "TV Movie", "War", "Western"
-  ];
+  let genre_options: Record<string, string> = {
+    'A': 'Action',
+    'B': 'Adventure',
+    'C': 'Animation',
+    'D': 'Comedy',
+    'E': 'Crime',
+    'F': 'Documentary',
+    'G': 'Drama',
+    'H': 'Family',
+    'I': 'Fantasy',
+    'J': 'History',
+    'K': 'Horror',
+    'L': 'Music',
+    'M': 'Mystery',
+    'N': 'Romance',
+    'O': 'Science Fiction',
+    'P': 'TV Movie',
+    'Q': 'Thriller',
+    'R': 'War',
+    'S': 'Western',
+  }
 
   let month_options: Record<string, string> = { 
       "1": "January", 
@@ -47,22 +63,22 @@
   let release_month: string = $state("");
   let genres: string[] = $state([]);
   let original_language: string = $state("");
-  let genresSelection = $derived(genres.join(', '));
+  let genresSelection = $derived(genres.map(g => genre_options[g]).join(', '))
 
   async function predict(e: SubmitEvent) {
     e.preventDefault();
 
-    form.vote_count = Number(vote_count); 
-    form.vote_average = Number(vote_average); 
-    form.budget = Number(budget); 
-    form.number_of_production_countries = Number(number_of_production_countries);
-    form.number_of_production_companies = Number(number_of_production_companies); 
-    form.number_of_spoken_languages = Number(number_of_spoken_languages); 
-    form.popularity = Number(popularity); 
-    form.runtime = Number(runtime); 
-    form.release_month = Number(release_month); 
+    form.vote_count = vote_count; 
+    form.vote_average = vote_average; 
+    form.budget = budget; 
+    form.number_of_production_countries = number_of_production_countries;
+    form.number_of_production_companies = number_of_production_companies; 
+    form.number_of_spoken_languages = number_of_spoken_languages; 
+    form.popularity = popularity; 
+    form.runtime = runtime; 
+    form.release_month = release_month; 
     form.original_language = original_language;
-    form.genres = "";
+    form.genres = genres;
 
     navigate('/prediction/result', { viewTransition: true });
   }
@@ -91,8 +107,8 @@
         <Select.Root type="multiple" bind:value={genres}>
           <Select.Trigger class="w-full">{genresSelection}</Select.Trigger>
           <Select.Content>
-            {#each genre_options as genre_option}
-              <Select.Item value={genre_option}>{genre_option}</Select.Item>
+            {#each Object.entries(genre_options) as [genre_value, genre_label]}
+              <Select.Item value={genre_value}>{genre_label}</Select.Item>
             {/each}
           </Select.Content>
         </Select.Root>

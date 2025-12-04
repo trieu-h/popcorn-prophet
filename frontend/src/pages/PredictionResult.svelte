@@ -7,9 +7,10 @@
   import { onMount } from "svelte";
   import { form } from "./states.svelte";
   import { API_URL } from "../const/const";
-  import type { Prediction } from "src/types/types";
+  import { convert_form_to_body, type Prediction } from "../types/types";
 
-  let projected_revenue = $state<number>();
+  let prediction = $state<Prediction>();
+  let verdict = $state<string>('');
 
   function backToInput() {
     const prediction_wrapper = document.querySelector("#prediction-wrapper") as HTMLDivElement;
@@ -18,20 +19,36 @@
   }
 
   function runSimulation() {
-    navigate('/prediction/result/simulation', { viewTransition: true });
+    navigate('/prediction/result/simulation', { viewTransition: true, state: { predicted_revenue: prediction?.predicted_revenue } });
   }
 
   const currency_formatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  const number_format = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 
   onMount(async () => {
+    if (!Object.keys(form).length) {
+      navigate('/prediction');
+    }
+
     const res = await fetch(`${API_URL}/predict`, {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form)
+      body: JSON.stringify(convert_form_to_body(form))
     });
 
-    const prediction_res: Prediction = await res.json();
-    projected_revenue = prediction_res.predicted_revenue;
+    prediction = await res.json();
+    const predicted_revenue = prediction?.predicted_revenue ?? 0;
+
+    const ratio = predicted_revenue / form.budget;
+    if (ratio >= 3 || predicted_revenue >= 500_000_000) {
+      verdict = 'Blockbuster';
+    } else if (2.5 < ratio && ratio <= 3) {
+      verdict = 'Moderate Hit';
+    } else if (2 < ratio && ratio <= 2.5) {
+      verdict = 'Break-even';
+    } else {
+      verdict = 'Flop';
+    }
   })
 </script>
 
@@ -49,16 +66,23 @@
         <Card.Title class="text-white">Projected Revenue</Card.Title>
       </Card.Header>
       <Card.Content>
-        <p class="text-4xl font-extrabold text-light-blue">{projected_revenue ? currency_formatter.format(projected_revenue) : "-"}</p>
+        <p class="text-4xl font-extrabold text-light-blue">{prediction?.predicted_revenue ? currency_formatter.format(prediction.predicted_revenue) : "-"}</p>
       </Card.Content>
     </Card.Root>  
 
     <Card.Root class="flex-1 bg-blue-gray gap-4 border-blue-gray-2 min-w-0">
       <Card.Header>
-        <Card.Title class="text-white">Confidence</Card.Title>
+        <Card.Title class="text-white">Regression Metrics</Card.Title>
       </Card.Header>
       <Card.Content>
-        <p class="text-white text-4xl font-extrabold">85%</p>
+        <div class="grid grid-cols-[100px_1fr] text-white text-2xl">
+          <span class="text-2xl">MSE</span>
+          <span class="text-light-blue font-extrabold">{prediction?.MSE ? number_format.format(prediction.MSE) : "-"}</span>
+          <span class="text-2xl">RMSE</span>
+          <span class="text-light-blue font-extrabold">{prediction?.RMSE ? number_format.format(prediction.RMSE) : "-"}</span>
+          <span class="text-2xl">MAE</span>
+          <span class="text-light-blue font-extrabold">{prediction?.MAE ? number_format.format(prediction.MAE) : "-"}</span>
+        </div>
       </Card.Content>
     </Card.Root>  
 
@@ -67,12 +91,12 @@
         <Card.Title class="text-white">Verdict</Card.Title>
       </Card.Header>
       <Card.Content>
-        <p class="text-white text-4xl font-extrabold">Potential Blockbuster</p>
+        <p class="text-white text-4xl font-extrabold">{verdict}</p>
       </Card.Content>
     </Card.Root>
   </div>
 
-  <p class="text-gray-2 self-center mb-12">Confidence interval: $135M - $165M</p>
+  <!-- <p class="text-gray-2 self-center mb-12">Confidence interval: $135M - $165M</p> -->
   
   <div class="bg-blue-gray border border-blue-gray-2 rounded-xl px-8 py-6 mb-10 ">
     <h1 class="text-white font-bold text-xl mb-5">How It Compares</h1>
