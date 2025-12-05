@@ -13,7 +13,7 @@
   let last_movie_id_state: number | null = null;
 
   let timeout: number | null = null;
-  const cooldown = 350;
+  const cooldown = 200;
 
   if (route.state === 'navigateFromResult' && localStorage.getItem("states")) {
     const states = JSON.parse(localStorage.getItem("states")!);

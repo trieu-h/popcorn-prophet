@@ -102,10 +102,12 @@
     </div>
 
     <div class="flex gap-4"> 
-      <div class="flex-1 flex flex-col gap-2">
+      <div class="flex-1 flex flex-col gap-2 overflow-hidden">
         <label class="text-white">Genre(s)</label> 
         <Select.Root type="multiple" bind:value={genres}>
-          <Select.Trigger class="w-full">{genresSelection}</Select.Trigger>
+          <Select.Trigger class="w-full">
+            <div class="overflow-hidden text-ellipsis"> {genresSelection} </div>
+          </Select.Trigger>
           <Select.Content>
             {#each Object.entries(genre_options) as [genre_value, genre_label]}
               <Select.Item value={genre_value}>{genre_label}</Select.Item>

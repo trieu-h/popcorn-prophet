@@ -11,7 +11,7 @@
   let parameter_selection = $state("budget");
 
   let parameter_options: Record<string, string> = {
-    "budget": "Budget ($)",
+    "budget": "Budget",
     "release_month": "Release Month",
     "runtime": "Runtime",
     "popularity": "Popularity",
@@ -128,7 +128,9 @@
   }
 
   async function onParameterChange(x_param: string) {
-    config.options.scales.x.title.text = parameter_options[x_param];
+    let x_label = parameter_options[x_param];
+    if (x_label === 'Budget') x_label += " ($)";
+    config.options.scales.x.title.text = x_label;
     updateChart();
   }
 
@@ -166,12 +168,14 @@
           </Select.Content>
         </Select.Root>
     </div>
-    <div class="flex flex-col flex-1">
+    <div class="flex flex-col flex-1 overflow-hidden">
       <p class="text-white mb-2">
         Filter by Genre
       </p>
       <Select.Root type="multiple" bind:value={genres} onValueChange={updateChart}>
-          <Select.Trigger class="w-full">{genres_selection}</Select.Trigger>
+          <Select.Trigger class="w-full">
+            <div class="overflow-hidden text-ellipsis">{genres_selection}</div>
+          </Select.Trigger>
           <Select.Content>
             {#each genre_options as genre_option}
               <Select.Item value={genre_option}>{genre_option}</Select.Item>
