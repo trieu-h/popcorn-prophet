@@ -1,11 +1,16 @@
 <script lang="ts">
-  import * as Select from "$lib/components/ui/select/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
-  import { Chart } from "chart.js/auto";
-  import { onMount, onDestroy } from "svelte";
-  import { API_URL } from "../const/const";
+  import * as Select from "$lib/components/ui/select/index.js";
+  import ChartJSTrendline from 'chartjs-plugin-trendline';
   import type { Exploration } from "../types/types";
+  import { API_URL } from "../const/const";
+  import { Chart } from "chart.js/auto";
+  import { Skeleton } from "$lib/components/ui/skeleton/index.js";
   import { currency_formatter, number_formatter } from "./reuse";
+  import { onMount, onDestroy } from "svelte";
+
+  let showLineOfBestFit = $state(false);
+  let loading = $state(false);
 
   //Parameters
   let parameter_selection = $state("budget");
@@ -33,13 +38,21 @@
   let chartInstance: Chart;
   let exploration = $state<Exploration | null>(null);
 
+  const trendline = {
+    colorMin: "red",
+    lineStyle: "solid",
+    width: 3,
+    label: {
+      display: false,
+    }
+  }
+
   const data = {
     datasets: [{
       label: 'Scatter Dataset',
       data: [],
       backgroundColor: '#0F93D4',
-      parsing: false
-    }],
+    }]
   };
 
   const commonConfig = {
@@ -47,7 +60,10 @@
       color: "#FFFFFF"
     },
     ticks: {
-      color: '#FFFFFF'
+      color: '#FFFFFF',
+      callback: (value: number, _index: number, _ticks: any[]) => {
+        return currency_formatter.format(value);
+      }
     }
   }
 
@@ -69,7 +85,7 @@
               const yLabel = config.options.scales.y.title.text;
               const xValue = context.parsed.x;
               const yValue = context.parsed.y;
-              return `${xLabel}: ${xValue}, ${yLabel}: ${yValue}`;
+              return `${xLabel}: ${currency_formatter.format(xValue)}, ${yLabel}: ${currency_formatter.format(yValue)}`;
             }
           }
         }
@@ -85,7 +101,7 @@
           type: 'linear',
           position: 'bottom',
           title: {
-            text: 'Budget ($)',
+            text: 'Budget',
             color: '#FFFFFF',
             display: true
           },
@@ -93,7 +109,7 @@
         },
         y: {
           title: {
-            text: 'Revenue ($)',
+            text: 'Revenue',
             color: '#FFFFFF',
             display: true
           },
@@ -104,6 +120,7 @@
   };
 
   onMount(async () => {
+    Chart.register(ChartJSTrendline);
     chartElem = document.getElementById("scatter-chart") as HTMLCanvasElement;
 
     if (chartElem) {
@@ -116,9 +133,7 @@
   })
 
   onDestroy(() => {
-    if (chartElem) {
-      chartElem.remove();
-    }
+    chartElem?.remove();
   })
 
   async function updateChart() {
@@ -128,13 +143,12 @@
   }
 
   async function onParameterChange(x_param: string) {
-    let x_label = parameter_options[x_param];
-    if (x_label === 'Budget') x_label += " ($)";
-    config.options.scales.x.title.text = x_label;
+    config.options.scales.x.title.text = parameter_options[x_param];
     updateChart();
   }
 
   async function fetchExploration(): Promise<Exploration> {
+    loading = true;
     const url = new URL(`${API_URL}/exploration`);
     const searchParams = url.searchParams;
     if (parameter_selection) {
@@ -144,7 +158,17 @@
       searchParams.set("genres", genres_selection);
     }
     const exploration_res = await fetch(url)
+    loading = false;
     return await exploration_res.json();
+  }
+
+  function onCheckShowLineOfBestFit() {
+    if (showLineOfBestFit) {
+      (config.data.datasets[0] as any).trendlineLinear = trendline;
+    } else {
+      delete (config.data.datasets[0] as any).trendlineLinear;
+    }
+    chartInstance.update();
   }
 </script>
 
@@ -174,7 +198,7 @@
       </p>
       <Select.Root type="multiple" bind:value={genres} onValueChange={updateChart}>
           <Select.Trigger class="w-full">
-            <div class="overflow-hidden text-ellipsis">{genres_selection}</div>
+            <div class="overflow-hidden text-ellipsis">{genres_selection ? genres_selection : "Select genre(s)"}</div>
           </Select.Trigger>
           <Select.Content>
             {#each genre_options as genre_option}
@@ -184,7 +208,7 @@
         </Select.Root>
     </div>
     <div class="flex gap-2 mb-2 flex-1">
-      <input type="checkbox" checked={false} />
+      <input type="checkbox" bind:checked={showLineOfBestFit} onchange={onCheckShowLineOfBestFit}/>
       <label class="text-white">Show Line of Best Fit</label>
     </div>
   </div>
@@ -200,7 +224,12 @@
       <Card.Header>
         <Card.Title class="text-light-gray">Movies</Card.Title>
       </Card.Header>
-      <Card.Content> <p class="text-4xl font-extrabold text-white">{exploration?.total_number_of_movies ? number_formatter.format(exploration?.total_number_of_movies) : "-"}</p>
+      <Card.Content> 
+        {#if loading}
+          <Skeleton class="h-10 w-2/3 bg-white"/>
+        {:else}
+          <p class="text-4xl font-extrabold text-white">{exploration?.total_number_of_movies ? number_formatter.format(exploration?.total_number_of_movies) : "-"}</p>
+        {/if}
       </Card.Content>
     </Card.Root>  
 
@@ -209,7 +238,11 @@
         <Card.Title class="text-light-gray">Average Revenue</Card.Title>
       </Card.Header>
       <Card.Content>
-        <p class="text-white text-4xl font-extrabold">{exploration?.average_revenue ? currency_formatter.format(exploration?.average_revenue) : "-"}</p>
+        {#if loading}
+          <Skeleton class="h-10 w-2/3 bg-white"/>
+        {:else}
+          <p class="text-white text-4xl font-extrabold">{exploration?.average_revenue ? currency_formatter.format(exploration?.average_revenue) : "-"}</p>
+        {/if}
       </Card.Content>
     </Card.Root>  
 
@@ -218,7 +251,11 @@
         <Card.Title class="text-light-gray">Average Budget</Card.Title>
       </Card.Header>
       <Card.Content>
-        <p class="text-white text-4xl font-extrabold">{exploration?.average_budget ? currency_formatter.format(exploration?.average_budget) : "-"}</p>
+        {#if loading}
+          <Skeleton class="h-10 w-2/3 bg-white"/>
+        {:else}
+          <p class="text-white text-4xl font-extrabold">{exploration?.average_budget ? currency_formatter.format(exploration?.average_budget) : "-"}</p>
+        {/if}
       </Card.Content>
     </Card.Root>
 
@@ -227,7 +264,11 @@
         <Card.Title class="text-light-gray">Highest Revenue</Card.Title>
       </Card.Header>
       <Card.Content>
-        <p class="text-white text-4xl font-extrabold">{exploration?.highest_revenue ? currency_formatter.format(exploration?.highest_revenue) : "-"}</p>
+        {#if loading}
+          <Skeleton class="h-10 w-2/3 bg-white"/>
+        {:else}
+          <p class="text-white text-4xl font-extrabold">{exploration?.highest_revenue ? currency_formatter.format(exploration?.highest_revenue) : "-"}</p>
+        {/if}
       </Card.Content>
     </Card.Root>
   </div>

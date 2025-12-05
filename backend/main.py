@@ -62,30 +62,33 @@ async def predict(movie: Movie):
     return {'predicted_revenue': predictions_df.iloc[0]['prediction_label'], **metrics_row}
 
 @app.get("/exploration")
-async def getExploration(x_param: str, genres = None):
+async def get_exploration(x_param: str, genres = None):
     # FIXME: SQL Injection alert !!!!!!!!!!!!
-    query = f"SELECT {x_param} as x, revenue as y FROM MOVIES"
+    where_clause = "";
     if (genres):
         genres = genres.split(", ")
         genres = map(lambda genre: f"genres LIKE '%{genre}%'", genres)
-        query = query + " WHERE " + (" AND ").join(genres)
+        where_clause = " WHERE " + (" AND ").join(genres)
 
-    query = query + " LIMIT 10000"
+    pairs_q = f"SELECT {x_param} as x, revenue as y FROM MOVIES" + where_clause + " LIMIT 10000"
+    pairs_q_exec = cursor.execute(pairs_q)
+    pairs = pairs_q_exec.fetchall();
 
-    pairs_q = cursor.execute(query)
-    pairs = pairs_q.fetchall();
+    total_number_of_movies_q = "SELECT COUNT(*) FROM movies" + where_clause
+    total_number_of_movies_q_exec = cursor.execute(total_number_of_movies_q)
+    total_number_of_movies = total_number_of_movies_q_exec.fetchone()['COUNT(*)']
 
-    count_all_movies_q = cursor.execute("SELECT COUNT(*) FROM movies")
-    total_number_of_movies = count_all_movies_q.fetchone()['COUNT(*)']
+    average_revenue_q = "SELECT AVG(revenue) FROM movies" + where_clause
+    average_revenue_q_exec = cursor.execute(average_revenue_q)
+    average_revenue = average_revenue_q_exec.fetchone()['AVG(revenue)']
 
-    average_revenue_q = cursor.execute("SELECT AVG(revenue) FROM movies")
-    average_revenue = average_revenue_q.fetchone()['AVG(revenue)']
+    average_budget_q = "SELECT AVG(budget) FROM movies" + where_clause
+    average_budget_q_exec = cursor.execute(average_budget_q)
+    average_budget = average_budget_q_exec.fetchone()['AVG(budget)']
 
-    average_budget_q = cursor.execute("SELECT AVG(budget) FROM movies")
-    average_budget = average_budget_q.fetchone()['AVG(budget)']
-
-    highest_revenue_q = cursor.execute("SELECT MAX(revenue) FROM movies")
-    highest_revenue = highest_revenue_q.fetchone()['MAX(revenue)']
+    highest_revenue_q = "SELECT MAX(revenue) FROM movies" + where_clause
+    highest_revenue_q_exec = cursor.execute(highest_revenue_q)
+    highest_revenue = highest_revenue_q_exec.fetchone()['MAX(revenue)']
 
     return {
         "plot_dataset": pairs,
