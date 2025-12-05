@@ -7,6 +7,7 @@
   import type { Movie } from "src/types/types";
   import { POSTER_PREFIX } from "../const/const";
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
+  import { currency_formatter } from "./reuse";
 
   let movie = $state<Movie>();
   let backdrop_dom_node: HTMLDivElement | null = null;
@@ -45,8 +46,6 @@
   onDestroy(() => {
     backdrop_dom_node?.remove();
   })
-
-  const number_formatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
   const extract_release_year = (date: string) => {
     if (!date) return '';
@@ -112,7 +111,7 @@
       </Card.Header>
       <Card.Content>
         {#if !loading}
-          <p class="text-white text-4xl font-extrabold">{number_formatter.format(movie?.revenue as number)}</p>
+          <p class="text-white text-4xl font-extrabold">{currency_formatter.format(movie?.revenue as number)}</p>
         {:else}
           <Skeleton class="h-10 bg-gray-2 w-60 opacity-20"></Skeleton>
         {/if}
@@ -128,7 +127,7 @@
       </Card.Header>
       <Card.Content>
         {#if !loading}
-          <p class="text-white text-4xl font-extrabold">{number_formatter.format(movie?.predicted_revenue as number)}</p>
+          <p class="text-white text-4xl font-extrabold">{currency_formatter.format(movie?.predicted_revenue as number)}</p>
         {:else}
           <Skeleton class="h-10 bg-gray-2 w-60 opacity-20"></Skeleton>
         {/if}

@@ -8,6 +8,7 @@
   import { form } from "./states.svelte";
   import { API_URL } from "../const/const";
   import { convert_form_to_body, type Prediction } from "../types/types";
+  import { number_formatter, currency_formatter } from "./reuse";
 
   let prediction = $state<Prediction>();
   let verdict = $state<string>('');
@@ -21,9 +22,6 @@
   function runSimulation() {
     navigate('/prediction/result/simulation', { viewTransition: true, state: { predicted_revenue: prediction?.predicted_revenue } });
   }
-
-  const currency_formatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
-  const number_format = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 
   onMount(async () => {
     if (!Object.keys(form).length) {
@@ -77,11 +75,11 @@
       <Card.Content>
         <div class="grid grid-cols-[100px_1fr] text-white text-2xl">
           <span class="text-2xl">MSE</span>
-          <span class="text-light-blue font-extrabold">{prediction?.MSE ? number_format.format(prediction.MSE) : "-"}</span>
+          <span class="text-light-blue font-extrabold">{prediction?.MSE ? number_formatter.format(prediction.MSE) : "-"}</span>
           <span class="text-2xl">RMSE</span>
-          <span class="text-light-blue font-extrabold">{prediction?.RMSE ? number_format.format(prediction.RMSE) : "-"}</span>
+          <span class="text-light-blue font-extrabold">{prediction?.RMSE ? number_formatter.format(prediction.RMSE) : "-"}</span>
           <span class="text-2xl">MAE</span>
-          <span class="text-light-blue font-extrabold">{prediction?.MAE ? number_format.format(prediction.MAE) : "-"}</span>
+          <span class="text-light-blue font-extrabold">{prediction?.MAE ? number_formatter.format(prediction.MAE) : "-"}</span>
         </div>
       </Card.Content>
     </Card.Root>  

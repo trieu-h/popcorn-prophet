@@ -8,6 +8,7 @@
   import { onMount } from "svelte";
   import { form } from "./states.svelte";
   import { API_URL } from "../const/const";
+  import { currency_formatter } from "./reuse";
 
   let genre_options: Record<string, string> = {
     'A': 'Action',
@@ -91,8 +92,6 @@
     const simulated = document.getElementById("simulated_height") as HTMLElement;
     simulated.style.height = `${Math.round(simulated_ratio * 100)}%`;
   });
-
-  const currency_formatter = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 
   onMount(async () => {
     if (!Object.keys(form).length) {

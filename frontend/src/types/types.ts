@@ -86,3 +86,11 @@ export function convert_form_to_body(form: MovieForm): MovieBody {
     genres: form.genres.join(""),
   };
 };
+
+export type Exploration = {
+  plot_dataset: Array<{ x: number, y: number }>,
+  total_number_of_movies: number;
+  average_revenue: number;
+  average_budget: number;
+  highest_revenue: number;
+}

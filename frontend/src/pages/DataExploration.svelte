@@ -3,39 +3,42 @@
   import * as Card from "$lib/components/ui/card/index.js";
   import { Chart } from "chart.js/auto";
   import { onMount, onDestroy } from "svelte";
+  import { API_URL } from "../const/const";
+  import type { Exploration } from "../types/types";
+  import { currency_formatter, number_formatter } from "./reuse";
 
   //Parameters
-  let parameterSelection = $state("Budget");
-  let parameterOptions = ["Budget", "Release Month", "Runtime", "Popularity", "Vote Count", "Vote Average", "Number of Languages", 
-                      "Number of Production Companies", "Number of Production Countries"];
+  let parameter_selection = $state("budget");
+
+  let parameter_options: Record<string, string> = {
+    "budget": "Budget ($)",
+    "release_month": "Release Month",
+    "runtime": "Runtime",
+    "popularity": "Popularity",
+    "vote_count": "Vote Count",
+    "vote_average": "Vote Average",
+    "number_of_spoken_languages": "Number of Languages",
+    "number_of_production_countries": "Number of Production Countries",
+    "number_of_production_companies": "Number of Production Companies"
+  }
 
   // Genre
   let genres: string[] = $state([]);
-  let genresSelection = $derived(genres.join(', '));
-  let genreOptions = ["Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", 
+  let genres_selection = $derived(genres.join(', '));
+  let genre_options = ["Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", 
                       "Family", "Fantasy", "History", "Horror", "Music", "Mystery", "Romance", "Science Fiction",
                       "Thriller", "TV Movie", "War", "Western"];
 
   let chartElem: HTMLCanvasElement;
   let chartInstance: Chart;
+  let exploration = $state<Exploration | null>(null);
 
   const data = {
     datasets: [{
       label: 'Scatter Dataset',
-      data: [{
-        x: -10,
-        y: 0
-      }, {
-        x: 0,
-        y: 10
-      }, {
-        x: 10,
-        y: 5
-      }, {
-        x: 0.5,
-        y: 5.5
-      }],
-      backgroundColor: '#0F93D4'
+      data: [],
+      backgroundColor: '#0F93D4',
+      parsing: false
     }],
   };
 
@@ -52,6 +55,7 @@
     type: 'scatter',
     data: data,
     options: {
+      aimation: false,
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
@@ -81,7 +85,7 @@
           type: 'linear',
           position: 'bottom',
           title: {
-            text: 'Budget (Millions $)',
+            text: 'Budget ($)',
             color: '#FFFFFF',
             display: true
           },
@@ -89,7 +93,7 @@
         },
         y: {
           title: {
-            text: 'Revenue (Millions $)',
+            text: 'Revenue ($)',
             color: '#FFFFFF',
             display: true
           },
@@ -99,12 +103,16 @@
     }
   };
 
-  onMount(() => {
+  onMount(async () => {
     chartElem = document.getElementById("scatter-chart") as HTMLCanvasElement;
 
     if (chartElem) {
       chartInstance = new Chart(chartElem, config as any)
     }
+
+    exploration = await fetchExploration();
+    (config.data.datasets[0] as any).data = $state.snapshot(exploration?.plot_dataset);
+    chartInstance.update();
   })
 
   onDestroy(() => {
@@ -113,11 +121,29 @@
     }
   })
 
-  function onParameterChange(parameter: string) {
-    config.options.scales.x.title.text = parameter;
+  async function updateChart() {
+    exploration = await fetchExploration();
+    (config.data.datasets[0] as any).data = $state.snapshot(exploration?.plot_dataset);
     chartInstance.update();
   }
 
+  async function onParameterChange(x_param: string) {
+    config.options.scales.x.title.text = parameter_options[x_param];
+    updateChart();
+  }
+
+  async function fetchExploration(): Promise<Exploration> {
+    const url = new URL(`${API_URL}/exploration`);
+    const searchParams = url.searchParams;
+    if (parameter_selection) {
+      searchParams.set("x_param", parameter_selection);
+    }
+    if (genres_selection) {
+      searchParams.set("genres", genres_selection);
+    }
+    const exploration_res = await fetch(url)
+    return await exploration_res.json();
+  }
 </script>
 
 <div class="flex flex-col max-w-7xl mx-auto pt-10 px-6">
@@ -131,11 +157,11 @@
       <p class="text-white mb-2">
         Select Parameter
       </p>
-      <Select.Root type="single" bind:value={parameterSelection} onValueChange={onParameterChange}>
-          <Select.Trigger class="w-full">{parameterSelection}</Select.Trigger>
+      <Select.Root type="single" bind:value={parameter_selection} onValueChange={onParameterChange}>
+          <Select.Trigger class="w-full">{parameter_options[parameter_selection]}</Select.Trigger>
           <Select.Content>
-            {#each parameterOptions as parameterOption}
-              <Select.Item value={parameterOption}>{parameterOption}</Select.Item>
+            {#each Object.entries(parameter_options) as [parameter_value, parameter_option]}
+              <Select.Item value={parameter_value}>{parameter_option}</Select.Item>
             {/each}
           </Select.Content>
         </Select.Root>
@@ -144,11 +170,11 @@
       <p class="text-white mb-2">
         Filter by Genre
       </p>
-      <Select.Root type="multiple" bind:value={genres}>
-          <Select.Trigger class="w-full">{genresSelection}</Select.Trigger>
+      <Select.Root type="multiple" bind:value={genres} onValueChange={updateChart}>
+          <Select.Trigger class="w-full">{genres_selection}</Select.Trigger>
           <Select.Content>
-            {#each genreOptions as genreOption}
-              <Select.Item value={genreOption}>{genreOption}</Select.Item>
+            {#each genre_options as genre_option}
+              <Select.Item value={genre_option}>{genre_option}</Select.Item>
             {/each}
           </Select.Content>
         </Select.Root>
@@ -170,7 +196,7 @@
       <Card.Header>
         <Card.Title class="text-light-gray">Movies</Card.Title>
       </Card.Header>
-      <Card.Content> <p class="text-4xl font-extrabold text-white">15</p>
+      <Card.Content> <p class="text-4xl font-extrabold text-white">{exploration?.total_number_of_movies ? number_formatter.format(exploration?.total_number_of_movies) : "-"}</p>
       </Card.Content>
     </Card.Root>  
 
@@ -179,7 +205,7 @@
         <Card.Title class="text-light-gray">Average Revenue</Card.Title>
       </Card.Header>
       <Card.Content>
-        <p class="text-white text-4xl font-extrabold">$1425M</p>
+        <p class="text-white text-4xl font-extrabold">{exploration?.average_revenue ? currency_formatter.format(exploration?.average_revenue) : "-"}</p>
       </Card.Content>
     </Card.Root>  
 
@@ -188,20 +214,17 @@
         <Card.Title class="text-light-gray">Average Budget</Card.Title>
       </Card.Header>
       <Card.Content>
-        <p class="text-white text-4xl font-extrabold">$167M</p>
+        <p class="text-white text-4xl font-extrabold">{exploration?.average_budget ? currency_formatter.format(exploration?.average_budget) : "-"}</p>
       </Card.Content>
     </Card.Root>
+
     <Card.Root class="flex-1 bg-dark-blue-3 gap-4 border-blue-gray-2">
       <Card.Header>
         <Card.Title class="text-light-gray">Highest Revenue</Card.Title>
       </Card.Header>
       <Card.Content>
-        <p class="text-white text-4xl font-extrabold">$2923M</p>
+        <p class="text-white text-4xl font-extrabold">{exploration?.highest_revenue ? currency_formatter.format(exploration?.highest_revenue) : "-"}</p>
       </Card.Content>
     </Card.Root>
   </div>
-
 </div>
-
-<style>
-</style>
