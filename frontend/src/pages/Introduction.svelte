@@ -14,7 +14,7 @@
 
 </script>
 
-<div class="bg-[url(src/assets/theater3.jpg)] bg-cover brightness-60 h-screen">
+<div class="bg-[url(/src/assets/theater3.jpg)] bg-cover brightness-60 h-screen">
     <div class="max-w-5xl mx-auto pt-25 flex flex-col px-6">
         <h1 class="text-white text-4xl font-bold pb-3 text-center">Welcome to Popcorn Prophet</h1>
         <p class="text-gray-2 pb-7 text-center mb-5">Predicting the Box Office Revenue of a Movie Using Predictive Analytics and Modelling.</p>
