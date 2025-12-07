@@ -112,7 +112,6 @@
   }
 
   async function predict(e: SubmitEvent) {
-    console.log(budget);
     e.preventDefault();
 
     is_release_month_dirty = true;

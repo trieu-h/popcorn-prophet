@@ -6,6 +6,7 @@
     errs = $bindable({}),
     is_dirty = $bindable(),
     required = false,
+    ...rest
   } = $props();
 
   let this_input: HTMLInputElement;
@@ -36,7 +37,7 @@
     );
   }
 
-  function convert_back_to_number(str: string) {
+  function convert_back_to_number(str: string): string {
     return str.replaceAll(/\$|\,|\./gi, "");
   }
 
@@ -59,9 +60,10 @@
     if (target.value.startsWith("$")) {
       previousNumberOfSymbol = target.value.match(/\$|\,|\./gi)!.length;
       value = convert_back_to_number(target.value);
-      target.value = currency_formatter.format(parseInt(value));
+      this_input.value = currency_formatter.format(parseInt(value))
     } else {
-      target.value = currency_formatter.format(parseInt(target.value));
+      value = parseInt(target.value);
+      this_input.value = currency_formatter.format(value)
     }
 
     if (is_numeric(e.key) || is_backspace(e.key)) {
@@ -73,6 +75,7 @@
       );
     }
 
+    is_dirty = true;
     // FIXME: bug occurs when users delete the dollar symbol
   }
 
@@ -83,7 +86,6 @@
       is_ctrl_a(e) ||
       is_backspace(e.key)
     ) {
-      is_dirty = true;
       return;
     }
     e.preventDefault();
@@ -107,12 +109,11 @@
     aria_invalid = Object.keys(errs).length > 0 && is_dirty === true;
   });
 
-  onMount(async () => {
-    await tick();
-    if (value && typeof value === 'string') {
-      this_input.value = currency_formatter.format(parseInt(value));
-    }
-  })
+  // $effect(() => {
+  //   if (value) {
+  //     this_input.value = currency_formatter.format(parseInt(value))
+  //   }
+  // })
 </script>
 
 <input
@@ -122,4 +123,5 @@
   aria-invalid={aria_invalid}
   {required}
   bind:this={this_input}
+  {...rest}
 />
