@@ -151,7 +151,6 @@
 
   onMount(() => {
     if (Object.values(form).length > 0) {
-      console.log(form);
       vote_count = form.vote_count; 
       vote_average = form.vote_average;
       budget = form.budget; 

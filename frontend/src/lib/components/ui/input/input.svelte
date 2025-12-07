@@ -8,6 +8,7 @@
     required = false,
     suffix = null,
     type = "text",
+    ...rest
   } = $props();
 
   let aria_invalid = $state<boolean | undefined>(undefined);
@@ -88,6 +89,7 @@
     max={max}
     min={min}
     required={required}
+    {...rest}
   />
   {#if suffix}
     <span class="absolute text-light-gray translate-y-1/4 -translate-x-[130%]">mins</span>

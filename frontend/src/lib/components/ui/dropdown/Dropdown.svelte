@@ -6,6 +6,7 @@
     is_dirty = $bindable(false),
     required = false,
     options,
+    on_value_change = null,
   } = $props();
 
   let aria_invalid = $state<boolean | undefined>(undefined);
@@ -30,6 +31,9 @@
 
   function on_change() {
     is_dirty = true;
+    if (on_value_change) {
+      on_value_change();
+    }
   }
 </script>
 

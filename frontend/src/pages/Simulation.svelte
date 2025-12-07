@@ -1,14 +1,19 @@
 <script lang="ts">
-  import ArrowUp from "@lucide/svelte/icons/arrow-up";
-  import ArrowDown from "@lucide/svelte/icons/arrow-down";
-	import * as Select from "$lib/components/ui/select/index.js";
 	import Button from "$lib/components/ui/button/button.svelte";
 	import RotateCCW from "@lucide/svelte/icons/rotate-ccw";
-  import { navigate, route } from "../router";
-  import { onMount } from "svelte";
-  import { form } from "./states.svelte";
+  import ArrowDown from "@lucide/svelte/icons/arrow-down";
+  import ArrowUp from "@lucide/svelte/icons/arrow-up";
+  import Dropdown from "$lib/components/ui/dropdown/Dropdown.svelte";
+  import Input from "$lib/components/ui/input/input.svelte";
+  import MaskedInput from "$lib/components/ui/masked-input/MaskedInput.svelte";
+  import MultiDropdown from "$lib/components/ui/multi-dropdown/MultiDropdown.svelte";
+  import TriangleAlert from "@lucide/svelte/icons/triangle-alert";
   import { API_URL } from "../const/const";
   import { currency_formatter } from "./reuse";
+  import { fade, fly } from 'svelte/transition';
+  import { form } from "./states.svelte";
+  import { navigate, route } from "../router";
+  import { onMount } from "svelte";
 
   let genre_options: Record<string, string> = {
     'A': 'Action',
@@ -68,11 +73,53 @@
   let release_month: string = $state("");
   let original_language: string = $state("");
   let genres: string[] = $state([]);
-  let genresSelection = $derived(genres.map(g => genre_options[g]).join(', '));
   let predicted_revenue: number = $state()!;
-  let initial_predicted_value: number;
+  let initial_predicted_value: number | undefined = $state();
   let updated_predicted_revenue: number | undefined = $state();
   let revenue_diff: number | null = $state(null);
+
+  let vote_average_errs = $state<Record<string, string>>({});
+  let number_of_language_errs = $state<Record<string, string>>({});
+  let number_of_production_companies_errs = $state<Record<string, string>>({});
+  let number_of_production_countries_errs = $state<Record<string, string>>({});
+  let popularity_errs = $state<Record<string, string>>({});
+  let vote_count_errs = $state<Record<string, string>>({});
+  let runtime_errs = $state<Record<string, string>>({});
+  let release_month_errs = $state<Record<string, string>>({});
+  let original_language_errs = $state<Record<string, string>>({});
+  let genres_errs = $state<Record<string, string>>({});
+  let budget_errs = $state<Record<string, string>>({});
+
+  let is_release_month_dirty = $state<boolean>(false);
+  let is_original_language_dirty = $state<boolean>(false);
+  let vote_average_dirty = $state<boolean>(false);
+  let is_number_of_spoken_languages_dirty = $state<boolean>(false);
+  let is_runtime_dirty = $state<boolean>(false);
+  let is_popularity_dirty = $state<boolean>(false);
+  let is_number_of_production_countries_dirty = $state<boolean>(false);
+  let is_vote_count_dirty = $state<boolean>(false);
+  let is_number_of_production_companies_dirty = $state<boolean>(false);
+  let is_genres_dirty = $state<boolean>(false);
+  let is_budget_dirty = $state<boolean>(false);
+
+  function check_for_errors() {
+    return (
+      Object.values(vote_average_errs).length > 0 ||
+      Object.values(number_of_language_errs).length > 0 ||
+      Object.values(number_of_production_companies_errs).length > 0 ||
+      Object.values(number_of_production_countries_errs).length > 0 ||
+      Object.values(popularity_errs).length > 0 ||
+      Object.values(vote_count_errs).length > 0 ||
+      Object.values(runtime_errs).length > 0 ||
+      Object.values(release_month_errs).length > 0 ||
+      Object.values(original_language_errs).length > 0 ||
+      Object.values(genres_errs).length > 0 ||
+      Object.values(budget_errs).length > 0
+    );
+  }
+
+  let original_bar!: HTMLElement;
+  let simulated_bar!: HTMLElement;
 
   $effect(() => {
     if (!revenue_diff || !updated_predicted_revenue) {
@@ -87,10 +134,8 @@
       simulated_ratio = 1;
       original_ratio = initial_predicted_value / updated_predicted_revenue;
     }
-    const original = document.getElementById("original_height") as HTMLElement;
-    original.style.height = `${Math.round(original_ratio * 100)}%`;
-    const simulated = document.getElementById("simulated_height") as HTMLElement;
-    simulated.style.height = `${Math.round(simulated_ratio * 100)}%`;
+    original_bar.style.height = `${Math.round(original_ratio * 100)}%`;
+    simulated_bar.style.height = `${Math.round(simulated_ratio * 100)}%`;
   });
 
   onMount(async () => {
@@ -99,6 +144,10 @@
       return;
     }
 
+    set_form_from_memory();
+  });
+
+  function set_form_from_memory() {
     vote_count = form.vote_count;
     vote_average = form.vote_average;
     budget = form.budget;
@@ -112,9 +161,22 @@
     number_of_spoken_languages = form.number_of_spoken_languages;
     predicted_revenue = (route.state as any).predicted_revenue as number;
     initial_predicted_value = predicted_revenue;
-  });
+    updated_predicted_revenue = undefined;
+  }
 
-  async function updatePrediction() {
+  function reset_all() {
+    set_form_from_memory();
+    simulated_bar.style.height = "0%";
+    original_bar.style.height = "100%";
+    revenue_diff = 0;
+    updated_predicted_revenue = 0;
+  }
+
+  async function update_prediction() {
+    if (check_for_errors()) {
+      return;
+    }
+
     const body = {
       vote_count,
       vote_average,
@@ -155,7 +217,7 @@
     <div class="bg-dark-blue-3 border border-blue-gray-2 rounded-xl flex flex-col flex-7/20 p-5">
       <div class="flex justify-between items-center mb-5">
         <h1 class="text-2xl text-white font-bold">Adjust Variables</h1>
-        <Button class="text-gray-2" variant="ghost">
+        <Button class="text-gray-2" variant="ghost" onclick={reset_all}>
           <RotateCCW/>
           Reset All
         </Button>
@@ -163,78 +225,145 @@
 
       <div class="flex flex-col gap-2 mb-6">
         <label class="text-white">Budget ($)</label>
-        <input class="bg-dark-blue-4 text-white px-3 py-2 w-full rounded-md border border-blue-gray-2" bind:value={budget} onblur={updatePrediction}/>
+        <MaskedInput bind:value={budget} bind:errs={budget_errs} bind:is_dirty={is_budget_dirty} required={true} onblur={update_prediction}/>
+        {#if is_budget_dirty}
+          {#each Object.values(budget_errs) as errMsg}
+            <div class="flex items-center gap-1">
+              <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
+              <span class="text-red-500 text-sm">{errMsg}</span> 
+            </div>
+          {/each}
+        {/if}
       </div>
 
       <div class="flex flex-col gap-2 mb-6">
-        <label class="text-white">Genre(s)</label>
-        <Select.Root type="multiple" bind:value={genres} onValueChange={updatePrediction}>
-          <Select.Trigger class="w-full">{genresSelection}</Select.Trigger>
-          <Select.Content>
-            {#each Object.entries(genre_options) as [genre_value, genre_label]}
-              <Select.Item value={genre_value}>{genre_label}</Select.Item>
-            {/each}
-          </Select.Content>
-        </Select.Root>
+        <label class="text-white">Genres</label>
+        <MultiDropdown options={genre_options} bind:errs={genres_errs} bind:is_dirty={is_genres_dirty} bind:value={genres} required={true} on_value_change={update_prediction}/>
+        {#if is_genres_dirty}
+          {#each Object.values(genres_errs) as errMsg}
+            <div class="flex items-center gap-1">
+              <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
+              <span class="text-red-500 text-sm">{errMsg}</span> 
+            </div>
+          {/each}
+        {/if}
       </div>
 
       <div class="flex flex-col gap-2 mb-6">
         <label class="text-white">Release Month</label>
-        <Select.Root type="single" bind:value={release_month} onValueChange={updatePrediction}>
-          <Select.Trigger class="w-full">{month_options[release_month]}</Select.Trigger>
-          <Select.Content>
-            {#each Object.entries(month_options) as [month_value, month_label]}
-              <Select.Item value={month_value}>{month_label}</Select.Item>
-            {/each}
-          </Select.Content>
-        </Select.Root>
+        <Dropdown bind:value={release_month} bind:errs={release_month_errs} bind:is_dirty={is_release_month_dirty} options={month_options} required={true} on_value_change={update_prediction}/>
+        {#if is_release_month_dirty}
+          {#each Object.values(release_month_errs) as errMsg}
+            <div class="flex items-center gap-1">
+              <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
+              <span class="text-red-500 text-sm">{errMsg}</span> 
+            </div>
+          {/each}
+        {/if}
       </div>
 
       <div class="flex flex-col gap-2 mb-6">
-        <label class="text-white">Runtime (minutes)</label>
-        <input class="bg-dark-blue-4 text-white px-3 py-2 w-full rounded-md border border-blue-gray-2" bind:value={runtime} onblur={updatePrediction}/>
+        <label class="text-white">Runtime</label>
+        <Input type="number" required={true} suffix="mins" bind:is_dirty={is_runtime_dirty} bind:value={runtime} bind:errs={runtime_errs} onblur={update_prediction}/>
+        {#if is_runtime_dirty}
+          {#each Object.values(runtime_errs) as errMsg}
+            <div class="flex items-center gap-1">
+              <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
+              <span class="text-red-500 text-sm">{errMsg}</span> 
+            </div>
+          {/each}
+        {/if}
       </div>
 
       <div class="flex flex-col gap-2 mb-6">
         <label class="text-white">Popularity</label>
-        <input class="bg-dark-blue-4 text-white px-3 py-2 w-full rounded-md border border-blue-gray-2" bind:value={popularity} onblur={updatePrediction}/>
+        <Input bind:value={popularity} bind:errs={popularity_errs} bind:is_dirty={is_popularity_dirty} required={true} type="number" onblur={update_prediction}/>
+        {#if is_popularity_dirty}
+          {#each Object.values(popularity_errs) as errMsg}
+            <div class="flex items-center gap-1">
+              <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
+              <span class="text-red-500 text-sm">{errMsg}</span> 
+            </div>
+          {/each}
+        {/if}
       </div>
 
       <div class="flex gap-4 mb-6">
         <div class="flex-1">
           <label class="text-white">Vote Count</label>
-          <input class="bg-dark-blue-4 text-white px-3 py-2 w-full rounded-md border border-blue-gray-2" bind:value={vote_count} onblur={updatePrediction}/>
+          <Input bind:value={vote_count} bind:errs={vote_count_errs} bind:is_dirty={is_vote_count_dirty} required={true} type="number" onblur={update_prediction}/>
+          {#if is_vote_count_dirty}
+            {#each Object.values(vote_count_errs) as errMsg}
+              <div class="flex items-center gap-1">
+                <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
+                <span class="text-red-500 text-sm">{errMsg}</span> 
+              </div>
+            {/each}
+          {/if}
         </div>
         <div class="flex-1">
           <label class="text-white">Vote Average</label>
-          <input class="bg-dark-blue-4 text-white px-3 py-2 w-full rounded-md border border-blue-gray-2" bind:value={vote_average} onblur={updatePrediction}/>
+          <Input min=0 max=10 type="number" bind:value={vote_average} bind:is_dirty={vote_average_dirty} bind:errs={vote_average_errs} required={true} onblur={update_prediction}/>
+          {#if vote_average_dirty}
+            {#each Object.values(vote_average_errs) as errMsg}
+              <div class="flex items-center gap-1">
+                <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
+                <span class="text-red-500 text-sm">{errMsg}</span> 
+              </div>
+            {/each}
+          {/if}
         </div>
       </div>
 
       <div class="flex flex-col gap-2 mb-6">
         <label class="text-white">Original Language</label>
-        <Select.Root type="single" bind:value={original_language} onValueChange={updatePrediction}>
-          <Select.Trigger class="w-full">{original_language_options[original_language]}</Select.Trigger>
-          <Select.Content>
-            {#each Object.entries(original_language_options) as [language_value, language_label]}
-              <Select.Item value={language_value}>{language_label}</Select.Item>
-            {/each}
-          </Select.Content>
-        </Select.Root>
+        <Dropdown bind:value={original_language} bind:errs={original_language_errs} bind:is_dirty={is_original_language_dirty} options={original_language_options} required={true} on_value_change={update_prediction}/>
+        {#if is_original_language_dirty}
+          {#each Object.values(original_language_errs) as errMsg}
+            <div class="flex items-center gap-1">
+              <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
+              <span class="text-red-500 text-sm">{errMsg}</span> 
+            </div>
+          {/each}
+        {/if}
       </div>
 
       <div class="flex gap-4">
         <div class="flex-1 flex flex-col gap-2">
           <label class="text-white"># Languages</label>
-          <input class="bg-dark-blue-4 text-white px-3 py-2 w-full rounded-md border border-blue-gray-2" bind:value={number_of_spoken_languages} onblur={updatePrediction}/>
+          <Input bind:value={number_of_spoken_languages} bind:is_dirty={is_number_of_spoken_languages_dirty} bind:errs={number_of_language_errs} required={true} type="number" onblur={update_prediction}/>
+          {#if is_number_of_spoken_languages_dirty}
+            {#each Object.values(number_of_language_errs) as errMsg}
+              <div class="flex items-center gap-1">
+                <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
+                <span class="text-red-500 text-sm">{errMsg}</span> 
+              </div>
+            {/each}
+          {/if}
         </div>
         <div class="flex-1 flex flex-col gap-2">
           <label class="text-white"># Prod. Comp.</label>
-          <input class="bg-dark-blue-4 text-white px-3 py-2 w-full rounded-md border border-blue-gray-2" bind:value={number_of_production_companies} onblur={updatePrediction}/>
-        </div>
+          <Input bind:value={number_of_production_companies} bind:is_dirty={is_number_of_production_companies_dirty} bind:errs={number_of_production_companies_errs} required={true} type="number" onblur={update_prediction}/>
+          {#if is_number_of_production_companies_dirty}
+            {#each Object.values(number_of_production_companies_errs) as errMsg}
+              <div class="flex items-center gap-1">
+                <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
+                <span class="text-red-500 text-sm">{errMsg}</span> 
+              </div>
+            {/each}
+          {/if}
+          </div>
         <div class="flex-1 flex flex-col gap-2">
           <label class="text-white"># Prod. Count.</label>
-          <input class="bg-dark-blue-4 text-white px-3 py-2 w-full rounded-md border border-blue-gray-2" bind:value={number_of_production_countries} onblur={updatePrediction}/>
+          <Input bind:value={number_of_production_countries} bind:is_dirty={is_number_of_production_countries_dirty} bind:errs={number_of_production_countries_errs} required={true} type="number" onblur={update_prediction}/>
+          {#if is_number_of_production_countries_dirty}
+            {#each Object.values(number_of_production_countries_errs) as errMsg}
+              <div class="flex items-center gap-1">
+                <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
+                <span class="text-red-500 text-sm">{errMsg}</span> 
+              </div>
+            {/each}
+          {/if}
         </div>
       </div>
     </div>
@@ -245,7 +374,7 @@
         <div class="flex gap-2">
           <p class="text-white font-extrabold text-4xl">{currency_formatter.format(predicted_revenue)}</p>
           {#if revenue_diff}
-            <div class="flex gap-1 {revenue_diff > 0 ? "text-light-green" : "text-light-red"} font-extrabold self-end pb-1" >
+            <div class="flex gap-1 {revenue_diff > 0 ? "text-light-green" : "text-light-red"} font-extrabold self-end pb-1" in:fly={{ y: 200, duration: 2000 }} out:fade>
                 {#if revenue_diff > 0}
                   <ArrowUp/>
                 {:else}
@@ -258,28 +387,24 @@
       </div>
       <div class="bg-dark-blue-3 border border-blue-gray-2 rounded-xl flex flex-col flex-1 p-7">
         <p class="text-white font-bold mb-3">Original vs. Simulated Revenue</p>
-        {#if !updated_predicted_revenue}
-          <p class="text-white">Please update any parameters in the left panel to observe the changes</p>
-        {:else}
-          <div class="flex text-white h-full">
-            <div class="flex flex-col flex-1 bg-blue items-center h-full">
-              <div class="flex-1 flex flex-col">
-                <div class="w-20 bg-blue-gray-2 mt-auto rounded-t-lg" id="original_height">
-                </div>
+        <div class="flex text-white h-full">
+          <div class="flex flex-col flex-1 bg-blue items-center h-full">
+            <div class="flex-1 flex flex-col">
+              <div class="w-20 bg-blue-gray-2 mt-auto rounded-t-lg transition-all ease-in-out h-full" bind:this={original_bar}>
               </div>
-              <span class="text-light-gray mb-2">Original</span>
-              <span>{currency_formatter.format(initial_predicted_value)}</span>
             </div>
-            <div class="flex flex-col flex-1 items-center h-full">
-              <div class="flex-1">
-                <div class="w-20 bg-light-blue rounded-t-lg" id="simulated_height">
-                </div>
-              </div>
-              <span class="mb-2">Simulated</span>
-              <span>{currency_formatter.format(updated_predicted_revenue)}</span>
-            </div>
+            <span class="text-light-gray mb-2">Original</span>
+            <span>{currency_formatter.format(initial_predicted_value)}</span>
           </div>
-        {/if}
+          <div class="flex flex-col flex-1 items-center h-full ">
+            <div class="flex-1 flex flex-col">
+              <div class="w-20 bg-light-blue mt-auto rounded-t-lg transition-all ease-in-out" bind:this={simulated_bar}>
+              </div>
+            </div>
+            <span class="mb-2">Simulated</span>
+            <span>{updated_predicted_revenue ? currency_formatter.format(updated_predicted_revenue) : "-"}</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>

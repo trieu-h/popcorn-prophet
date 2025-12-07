@@ -109,11 +109,11 @@
     aria_invalid = Object.keys(errs).length > 0 && is_dirty === true;
   });
 
-  // $effect(() => {
-  //   if (value) {
-  //     this_input.value = currency_formatter.format(parseInt(value))
-  //   }
-  // })
+  $effect(() => {
+    if (value) {
+      this_input.value = currency_formatter.format(parseInt(value))
+    }
+  })
 </script>
 
 <input
