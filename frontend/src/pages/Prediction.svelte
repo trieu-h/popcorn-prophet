@@ -200,7 +200,7 @@
     </div>
 
     <div class="flex gap-8 md:gap-4 flex-col md:flex-row"> 
-      <div class="flex-1 flex flex-col gap-2 overflow-hidden relative">
+      <div class="flex-1 flex flex-col gap-2 relative min-w-0">
         <label class="text-white">Genres</label> 
         <MultiDropdown options={genre_options} bind:errs={genres_errs} bind:is_dirty={is_genres_dirty} bind:value={genres} required={true}/>
         {#if is_genres_dirty}

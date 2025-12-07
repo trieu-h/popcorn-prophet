@@ -63,12 +63,13 @@ export type MovieBody = {
 
 export type Prediction = {
   predicted_revenue: number;
-  MAE: number,
-  MSE: number,
-  RMSE: number,
-  R2: number,
-  RMSLE: number,
-  MAPE: number,
+  similar_movies: Array<Movie>;
+  // MAE: number,
+  // MSE: number,
+  // RMSE: number,
+  // R2: number,
+  // RMSLE: number,
+  // MAPE: number,
 };
 
 export function convert_form_to_body(form: MovieForm): MovieBody {

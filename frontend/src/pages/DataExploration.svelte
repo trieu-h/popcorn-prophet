@@ -198,7 +198,7 @@
       </p>
       <Select.Root type="multiple" bind:value={genres} onValueChange={updateChart}>
           <Select.Trigger class="w-full">
-            <div class="overflow-hidden text-ellipsis">{genres_selection ? genres_selection : "Select genre(s)"}</div>
+            <div class="overflow-hidden text-ellipsis">{genres_selection ? genres_selection : "Select genres"}</div>
           </Select.Trigger>
           <Select.Content>
             {#each genre_options as genre_option}
@@ -226,7 +226,7 @@
       </Card.Header>
       <Card.Content> 
         {#if loading}
-          <Skeleton class="h-10 w-2/3 bg-white"/>
+          <Skeleton class="h-10 w-2/3 bg-light-gray"/>
         {:else}
           <p class="text-4xl font-extrabold text-white">{exploration?.total_number_of_movies ? number_formatter.format(exploration?.total_number_of_movies) : "-"}</p>
         {/if}
@@ -239,7 +239,7 @@
       </Card.Header>
       <Card.Content>
         {#if loading}
-          <Skeleton class="h-10 w-2/3 bg-white"/>
+          <Skeleton class="h-10 w-2/3 bg-light-gray"/>
         {:else}
           <p class="text-white text-4xl font-extrabold">{exploration?.average_revenue ? currency_formatter.format(exploration?.average_revenue) : "-"}</p>
         {/if}
@@ -252,7 +252,7 @@
       </Card.Header>
       <Card.Content>
         {#if loading}
-          <Skeleton class="h-10 w-2/3 bg-white"/>
+          <Skeleton class="h-10 w-2/3 bg-light-gray"/>
         {:else}
           <p class="text-white text-4xl font-extrabold">{exploration?.average_budget ? currency_formatter.format(exploration?.average_budget) : "-"}</p>
         {/if}
@@ -265,7 +265,7 @@
       </Card.Header>
       <Card.Content>
         {#if loading}
-          <Skeleton class="h-10 w-2/3 bg-white"/>
+          <Skeleton class="h-10 w-2/3 bg-light-gray"/>
         {:else}
           <p class="text-white text-4xl font-extrabold">{exploration?.highest_revenue ? currency_formatter.format(exploration?.highest_revenue) : "-"}</p>
         {/if}

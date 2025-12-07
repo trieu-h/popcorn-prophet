@@ -57,9 +57,26 @@ async def predict(movie: Movie):
     movie_dict = dict(movie);
     input_df = pd.DataFrame([movie_dict])
     predictions_df = predict_model(estimator=model, data=input_df)
-    metrics = cursor.execute("SELECT * FROM metrics")
-    metrics_row = metrics.fetchone()
-    return {'predicted_revenue': predictions_df.iloc[0]['prediction_label'], **metrics_row}
+    # metrics = cursor.execute("SELECT * FROM metrics")
+    # metrics_row = metrics.fetchone()
+
+    budget = movie.budget;
+    budget_upper_limit = budget * 2;
+    budget_lower_limit = budget / 2;
+
+    vote_average = movie.vote_average;
+    vote_average_upper_limit = vote_average + 2;
+    vote_average_lower_limit = vote_average - 2;
+
+    similar_movies_q = cursor.execute(f'''SELECT * FROM movies
+                                          WHERE vote_average BETWEEN {vote_average_lower_limit} AND {vote_average_upper_limit} 
+                                          AND budget BETWEEN {budget_lower_limit} AND {budget_upper_limit}
+                                          AND revenue > 0
+                                          LIMIT 10''')
+
+    similar_movies = similar_movies_q.fetchall()
+
+    return {'predicted_revenue': predictions_df.iloc[0]['prediction_label'], 'similar_movies': similar_movies}
 
 @app.get("/exploration")
 async def get_exploration(x_param: str, genres = None):

@@ -19,5 +19,7 @@
     </header>
 
     <Router></Router>
+
+    <div id="overlay" class="fixed top-0 left-0 h-full w-full pointer-events-none"></div>
 </main>
 
