@@ -170,14 +170,14 @@
   <h1 class="text-white text-4xl font-bold pb-3 text-center">Predict Your Movie's Box Office Revenue</h1>
   <p class="text-gray-2 pb-7 text-center">Enter movie details to predict its success</p>
 
-  <form class="flex flex-col bg-dark-blue-3 border border-blue-gray-2 rounded-xl px-8 py-5 gap-6" bind:this={this_form}>
-    <div class="flex gap-4"> 
-      <div class="flex-1 flex flex-col gap-2">
+  <form class="flex flex-col bg-dark-blue-3 border border-blue-gray-2 rounded-xl px-8 py-5 gap-8" bind:this={this_form}>
+    <div class="flex gap-8 md:gap-4 flex-col md:flex-row"> 
+      <div class="flex-1 flex flex-col gap-2 relative">
         <label class="text-white">Budget</label> 
         <MaskedInput bind:value={budget} bind:errs={budget_errs} bind:is_dirty={is_budget_dirty} required={true}/>
         {#if is_budget_dirty}
           {#each Object.values(budget_errs) as errMsg}
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1 absolute top-[110%]">
               <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
               <span class="text-red-500 text-sm">{errMsg}</span> 
             </div>
@@ -185,12 +185,12 @@
         {/if}
       </div>
 
-      <div class="flex-1 flex flex-col gap-2">
+      <div class="flex-1 flex flex-col gap-2 relative">
         <label class="text-white">Vote Average</label>
         <Input min=0 max=10 type="number" bind:value={vote_average} bind:is_dirty={vote_average_dirty} bind:errs={vote_average_errs} required={true}/>
         {#if vote_average_dirty}
           {#each Object.values(vote_average_errs) as errMsg}
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1 absolute top-[110%]">
               <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
               <span class="text-red-500 text-sm">{errMsg}</span> 
             </div>
@@ -199,13 +199,13 @@
       </div>
     </div>
 
-    <div class="flex gap-4"> 
-      <div class="flex-1 flex flex-col gap-2 overflow-hidden">
+    <div class="flex gap-8 md:gap-4 flex-col md:flex-row"> 
+      <div class="flex-1 flex flex-col gap-2 overflow-hidden relative">
         <label class="text-white">Genres</label> 
         <MultiDropdown options={genre_options} bind:errs={genres_errs} bind:is_dirty={is_genres_dirty} bind:value={genres} required={true}/>
         {#if is_genres_dirty}
           {#each Object.values(genres_errs) as errMsg}
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1 absolute top-[110%]">
               <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
               <span class="text-red-500 text-sm">{errMsg}</span> 
             </div>
@@ -213,12 +213,12 @@
         {/if}
       </div>
 
-       <div class="flex-1 flex flex-col gap-2">
+       <div class="flex-1 flex flex-col gap-2 relative">
         <label class="text-white">Original Language</label>
         <Dropdown bind:value={original_language} bind:errs={original_language_errs} bind:is_dirty={is_original_language_dirty} options={original_language_options} required={true}/>
         {#if is_original_language_dirty}
           {#each Object.values(original_language_errs) as errMsg}
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1 absolute top-[110%]">
               <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
               <span class="text-red-500 text-sm">{errMsg}</span> 
             </div>
@@ -227,13 +227,13 @@
       </div>
     </div>
 
-    <div class="flex gap-4"> 
-     <div class="flex-1 flex flex-col gap-2">
+    <div class="flex gap-8 md:gap-4 flex-col md:flex-row"> 
+     <div class="flex-1 flex flex-col gap-2 relative">
         <label class="text-white">Release Month</label> 
         <Dropdown bind:value={release_month} bind:errs={release_month_errs} bind:is_dirty={is_release_month_dirty} options={month_options} required={true}/>
         {#if is_release_month_dirty}
           {#each Object.values(release_month_errs) as errMsg}
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1 absolute top-[110%]">
               <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
               <span class="text-red-500 text-sm">{errMsg}</span> 
             </div>
@@ -241,12 +241,12 @@
         {/if}
       </div>
 
-      <div class="flex-1 flex flex-col gap-2">
+      <div class="flex-1 flex flex-col gap-2 relative">
         <label class="text-white">Number of Languages</label> 
         <Input bind:value={number_of_spoken_languages} bind:is_dirty={is_number_of_spoken_languages_dirty} bind:errs={number_of_language_errs} required={true} type="number"/>
         {#if is_number_of_spoken_languages_dirty}
           {#each Object.values(number_of_language_errs) as errMsg}
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1 absolute top-[110%]">
               <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
               <span class="text-red-500 text-sm">{errMsg}</span> 
             </div>
@@ -255,13 +255,13 @@
       </div>
     </div>
 
-    <div class="flex gap-4">
-      <div class="flex-1 flex flex-col gap-2">
+    <div class="flex gap-8 md:gap-4 flex-col md:flex-row"> 
+      <div class="flex-1 flex flex-col gap-2 relative">
         <label class="text-white">Runtime</label> 
         <Input type="number" required={true} suffix="mins" bind:is_dirty={is_runtime_dirty} bind:value={runtime} bind:errs={runtime_errs}/>
         {#if is_runtime_dirty}
           {#each Object.values(runtime_errs) as errMsg}
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1 absolute top-[110%]">
               <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
               <span class="text-red-500 text-sm">{errMsg}</span> 
             </div>
@@ -269,12 +269,12 @@
         {/if}
       </div>
 
-      <div class="flex-1 flex flex-col gap-2">
+      <div class="flex-1 flex flex-col gap-2 relative">
         <label class="text-white">Number of Production Companies</label> 
         <Input bind:value={number_of_production_companies} bind:is_dirty={is_number_of_production_companies_dirty} bind:errs={number_of_production_companies_errs} required={true} type="number"/>
         {#if is_number_of_production_companies_dirty}
           {#each Object.values(number_of_production_companies_errs) as errMsg}
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1 absolute top-[110%]">
               <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
               <span class="text-red-500 text-sm">{errMsg}</span> 
             </div>
@@ -283,13 +283,13 @@
       </div>
     </div>
     
-    <div class="flex gap-4">
-      <div class="flex-1 flex flex-col gap-2">
+    <div class="flex gap-8 md:gap-4 flex-col md:flex-row"> 
+      <div class="flex-1 flex flex-col gap-2 relative">
         <label class="text-white">Popularity</label> 
         <Input bind:value={popularity} bind:errs={popularity_errs} bind:is_dirty={is_popularity_dirty} required={true} type="number"/>
         {#if is_popularity_dirty}
           {#each Object.values(popularity_errs) as errMsg}
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1 absolute top-[110%]">
               <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
               <span class="text-red-500 text-sm">{errMsg}</span> 
             </div>
@@ -297,12 +297,12 @@
         {/if}
       </div>
 
-      <div class="flex-1 flex flex-col gap-2">
+      <div class="flex-1 flex flex-col gap-2 relative">
         <label class="text-white">Number of Production Countries</label> 
         <Input bind:value={number_of_production_countries} bind:is_dirty={is_number_of_production_countries_dirty} bind:errs={number_of_production_countries_errs} required={true} type="number"/>
         {#if is_number_of_production_countries_dirty}
           {#each Object.values(number_of_production_countries_errs) as errMsg}
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1 absolute top-[110%]">
               <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
               <span class="text-red-500 text-sm">{errMsg}</span> 
             </div>
@@ -311,20 +311,20 @@
       </div>
     </div>
 
-    <div class="flex gap-4">
-      <div class="flex-1 flex flex-col gap-2">
+    <div class="flex gap-8 md:gap-4 flex-col md:flex-row"> 
+      <div class="flex-1 flex flex-col gap-2 relative">
         <label class="text-white">Vote Count</label> 
         <Input bind:value={vote_count} bind:errs={vote_count_errs} bind:is_dirty={is_vote_count_dirty} required={true} type="number"/>
         {#if is_vote_count_dirty}
           {#each Object.values(vote_count_errs) as errMsg}
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-1 absolute top-[110%]">
               <TriangleAlert class="text-red-500" size="18"></TriangleAlert>
               <span class="text-red-500 text-sm">{errMsg}</span> 
             </div>
           {/each}
         {/if}
       </div>
-      <div class="flex-1 flex flex-col gap-2"></div>
+      <div class="hidden md:flex flex-1 flex-col gap-2"></div>
     </div>
 
     <Button variant="blue" onclick={predict} class="w-fit self-center" type="submit">
