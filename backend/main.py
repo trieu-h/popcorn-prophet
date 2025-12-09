@@ -8,7 +8,7 @@ import sqlite3
 conn = sqlite3.connect('movies.db')
 conn.row_factory = sqlite3.Row
 cursor = conn.cursor()
-model = load_model('../data-analysis/et_movie_revenue')
+model = load_model('et_movie_revenue')
 
 class Movie(BaseModel):
     budget: int
