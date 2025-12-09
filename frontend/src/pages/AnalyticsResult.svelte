@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
-  import { route, navigate } from "../router";
-  import ArrowLeft from "@lucide/svelte/icons/arrow-left";
   import * as Card from "$lib/components/ui/card/index.js";
-  import { Button } from "$lib/components/ui/button/index.js";
+  import ArrowLeft from "@lucide/svelte/icons/arrow-left";
   import type { Movie } from "src/types/types";
+  import { Button } from "$lib/components/ui/button/index.js";
   import { POSTER_PREFIX } from "../const/const";
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
   import { currency_formatter } from "./reuse";
+  import { onDestroy, onMount } from "svelte";
+  import { route, navigate } from "../router";
 
   let movie = $state<Movie>();
   let backdrop_dom_node: HTMLDivElement | null = null;
@@ -67,6 +67,70 @@
     if (m > 0) str += `${m}m`;
     return str;
   }
+
+  const original_language_map: Record<number, string> = {
+    1: "en",
+    0: "",
+    4: "hi",
+    3: "fr",
+    6: "ru",
+    2: "es",
+    5: "ja"
+  }
+
+  const get_original_language = (id: number) => {
+    if (!id) return "";
+    return original_language_map[id] ?? "";
+  }
+
+  // const genres_map: Record<string, string> = {
+  //   'Action': 'A',
+  //   'Adventure': 'B',
+  //   'Animation': 'C',
+  //   'Comedy': 'D', 
+  //   'Crime': 'E',
+  //   'Documentary': 'F',
+  //   'Drama': 'G',
+  //   'Family': 'H',
+  //   'Fantasy': 'I',
+  //   'History': 'J',
+  //   'Horror': 'K',
+  //   'Music': 'L',
+  //   'Mystery': 'M',
+  //   'Romance': 'N',
+  //   'Science Fiction': 'O',
+  //   'TV Movie': 'P',
+  //   'Thriller': 'Q',
+  //   'War': 'R',
+  //   'Western': 'S',
+  // }
+
+  const genres_map: Record<string, string> = {
+    'A': 'Action',
+    'B': 'Adventure',
+    'C': 'Animation',
+    'D': 'Comedy', 
+    'E': 'Crime',
+    'F': 'Documentary',
+    'G': 'Drama',
+    'H': 'Family',
+    'I': 'Fantasy',
+    'J': 'History',
+    'K': 'Horror',
+    'L': 'Music',
+    'M': 'Mystery',
+    'N': 'Romance',
+    'O': 'Science Fiction',
+    'P': 'TV Movie',
+    'Q': 'Thriller',
+    'R': 'War',
+    'S': 'Western'
+  }
+
+  const get_genres = (genres_string: string) => {
+    if (!genres_string) return "";
+    return genres_string.split("").map(g => genres_map[g]).join(", ");
+  }
 </script>
 
 <div class="flex flex-col max-w-7xl mx-auto pt-10 px-6">
@@ -87,8 +151,8 @@
         <div class="flex-7 text-white flex flex-col gap-3">
             <h1 class="text-2xl font-bold" id="title">{movie?.original_title} <span class="text-gray-2">({extract_release_year(movie?.release_date as string)})</span></h1>
             <div class="flex text-sm">
-              <span>{reformat_date(movie?.release_date as string)} ({movie?.original_language.toUpperCase()})</span>
-              <span class="pl-6 relative before:content-['•'] before:absolute before:left-2">{movie?.genres}</span>
+              <span>{reformat_date(movie?.release_date as string)} ({get_original_language(movie?.original_language).toUpperCase()})</span>
+              <span class="pl-6 relative before:content-['•'] before:absolute before:left-2">{get_genres(movie?.genres)}</span>
               <span class="pl-6 relative before:content-['•'] before:absolute before:left-2">{reformat_time(movie?.runtime as number)}</span>
             </div>
             <h3 class="text-xl font-bold">Overview</h3>

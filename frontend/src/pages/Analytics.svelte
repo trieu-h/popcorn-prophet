@@ -1,11 +1,12 @@
 <script lang="ts">
   import type { Movie } from "src/types/types";
-  import { Command, CommandInput } from "$lib/components/ui/command";
+  import { API_URL, POSTER_PREFIX } from "../const/const";
   import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card"
+  import { Command, CommandInput } from "$lib/components/ui/command";
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
   import { navigate, route } from "../router";
-  import { API_URL, POSTER_PREFIX } from "../const/const";
   import { onDestroy } from "svelte";
+  import { analytics_state } from "./states.svelte";
 
   let movies: Movie[] = $state([]);
   let search_string = $state("");
@@ -74,9 +75,13 @@
   }
 
   const scrollListener = () => {
-    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight) {
+    const innerHeight = window.innerHeight;
+    
+    if (innerHeight + window.scrollY >= document.documentElement.scrollHeight) {
       get_movies(search_string.trim(), last_movie_id_state!);
     }
+
+    analytics_state.show_back_to_top_button = document.documentElement.scrollTop > innerHeight / 2;
   }
   window.addEventListener("scroll", scrollListener);
 
@@ -86,7 +91,7 @@
   })
 </script>
 
-<div class="max-w-4xl mx-auto pt-10 flex flex-col px-6">
+<div class="max-w-4xl mx-auto pt-10 flex flex-col px-6 relative">
   <h1 class="text-white text-4xl font-bold pb-3 text-center">Find an Existing Movie</h1>
   <p class="text-gray-2 pb-7 text-center">Search our database to view the prediction explainability dashboard for any movie</p>
 
@@ -132,5 +137,6 @@
       </div>
     {/if}
   {/if}
+
 </div>
 

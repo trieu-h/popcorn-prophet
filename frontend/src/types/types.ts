@@ -9,7 +9,7 @@ export type Movie = {
   homepage: string;
   imdb_id: string;
   keywords: string;
-  original_language: string;
+  original_language: number;
   original_title: string;
   overview: string;
   popularity: number;
