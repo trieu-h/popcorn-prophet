@@ -9,6 +9,7 @@ conn = sqlite3.connect('movies.db')
 conn.row_factory = sqlite3.Row
 cursor = conn.cursor()
 model = load_model('et_movie_revenue')
+model._memory_full_transform.store_backend.location="./cache"
 
 class Movie(BaseModel):
     budget: int
