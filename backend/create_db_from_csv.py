@@ -1,21 +1,10 @@
+import csv
 import pandas as pd
 import sqlite3
-import csv
-from pycaret.regression import load_model, predict_model
 
-model = load_model('../data-analysis/et_movie_revenue')
-df = pd.read_csv("../data-analysis/movies.csv")
-
-movies = df.copy()
-movies = movies[(movies['adult'] == False) & (movies['status'] == 'Released')]
-movies = movies.dropna(subset=['production_companies', 'production_countries', 'spoken_languages', 'release_date'])
-
-movies['release_month'] = movies['release_date'].apply(lambda s: int(s.split('-')[1]))
-movies['number_of_production_companies'] = movies['production_companies'].apply(lambda s: len(s.split(',')))
-movies['number_of_production_countries'] = movies['production_countries'].apply(lambda s: len(s.split(',')))
-movies['number_of_spoken_languages'] = movies['spoken_languages'].apply(lambda s: len(s.split(',')))
-movies = predict_model(estimator=model, data=movies)
-movies = movies.rename(columns={'prediction_label': 'predicted_revenue'})
+# model = load_model('../data-analysis/et_movie_revenue')
+# movies = movies.rename(columns={'prediction_label': 'predicted_revenue'})
+movies = pd.read_csv("../data-analysis/movies_trained.csv")
 
 conn = sqlite3.connect('movies.db');
 print("Connecting to database")
@@ -37,7 +26,7 @@ cursor.execute("""CREATE TABLE "movies" (
 	"budget"	INTEGER,
 	"homepage"	TEXT,
 	"imdb_id"	TEXT,
-	"original_language"	TEXT,
+	"original_language"	INTEGER,
 	"original_title"	TEXT,
 	"overview"	TEXT,
 	"popularity"	REAL,
@@ -52,6 +41,25 @@ cursor.execute("""CREATE TABLE "movies" (
     "number_of_production_companies" INTEGER, 
     "number_of_production_countries" INTEGER, 
     "number_of_spoken_languages" INTEGER, 
+    "A" REAL,
+    "B" REAL,
+    "C" REAL,
+    "D" REAL,
+    "E" REAL,
+    "F" REAL,
+    "G" REAL,
+    "H" REAL,
+    "I" REAL,
+    "J" REAL,
+    "K" REAL,
+    "L" REAL,
+    "M" REAL,
+    "N" REAL,
+    "O" REAL,
+    "P" REAL,
+    "Q" REAL,
+    "R" REAL,
+    "S" REAL,
     "predicted_revenue" REAL,
 	PRIMARY KEY("id")
 ) """)

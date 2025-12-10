@@ -72,8 +72,31 @@ export type Prediction = {
   // MAPE: number,
 };
 
+let genre_options: Record<string, string> = {
+  'A': 'Action',
+  'B': 'Adventure',
+  'C': 'Animation',
+  'D': 'Comedy',
+  'E': 'Crime',
+  'F': 'Documentary',
+  'G': 'Drama',
+  'H': 'Family',
+  'I': 'Fantasy',
+  'J': 'History',
+  'K': 'Horror',
+  'L': 'Music',
+  'M': 'Mystery',
+  'N': 'Romance',
+  'O': 'Science Fiction',
+  'P': 'TV Movie',
+  'Q': 'Thriller',
+  'R': 'War',
+  'S': 'Western',
+}
+
 export function convert_form_to_body(form: MovieForm): MovieBody {
-  return {
+  const ret = {
+    ...form,
     vote_count: Number(form.vote_count), 
     vote_average: Number(form.vote_average), 
     budget: Number(form.budget), 
@@ -84,8 +107,17 @@ export function convert_form_to_body(form: MovieForm): MovieBody {
     runtime: Number(form.runtime), 
     release_month: Number(form.release_month), 
     original_language: form.original_language,
-    genres: form.genres.join(""),
   };
+
+  for (const genre_key of Object.keys(genre_options)){
+    if (form.genres.includes(genre_key)) {
+      ret[genre_key] = 1;
+    } else {
+      ret[genre_key] = 0;
+    }
+  }
+
+  return ret;
 };
 
 export type Exploration = {
@@ -95,3 +127,36 @@ export type Exploration = {
   average_budget: number;
   highest_revenue: number;
 }
+
+export type MovieAnalytics = {
+  id: number;
+  adult: string; // "True" | False" -> Probably fine for now
+  backdrop_path: string;
+  budget: number;
+  genres: string;
+  homepage: string;
+  imdb_id: string;
+  keywords: string;
+  original_language: number;
+  original_title: string;
+  overview: string;
+  popularity: number;
+  poster_path: string | null;
+  production_companies: string;
+  production_countries: string;
+  release_date: string;
+  revenue: number;
+  runtime: number;
+  spoken_languages: string;
+  status: Status;
+  tagline: string;
+  vote_average: number;
+  vote_count: number;
+  number_of_production_companies: number;
+  number_of_production_countries: number;
+  number_of_spoken_languages: number;
+  release_month: number;
+  predicted_revenue?: number;
+  shap_values: {[shap_key: string]: number}
+  base_value: number;
+};

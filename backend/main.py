@@ -1,19 +1,25 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pycaret.regression import load_model, predict_model
+from pycaret.regression import setup, load_model, predict_model
 from pydantic import BaseModel
+from typing import List
+import joblib
 import pandas as pd
+import shap
 import sqlite3
 
 conn = sqlite3.connect('movies.db')
 conn.row_factory = sqlite3.Row
 cursor = conn.cursor()
-model = load_model('et_movie_revenue')
-model._memory_full_transform.store_backend.location="./cache"
+
+# model._memory_full_transform.store_backend.location="./cache"
+# model = load_model('../data-analysis/et_movie_revenue')
+movies = pd.read_csv("../data-analysis/movies_cleaned.csv")
+setup(movies, target='revenue', session_id = 123)
+model = joblib.load("../data-analysis/scikit-learn-extra-tree-model.pkl")
 
 class Movie(BaseModel):
     budget: int
-    genres: str
     release_month: int
     runtime: int
     popularity: float
@@ -23,6 +29,25 @@ class Movie(BaseModel):
     number_of_spoken_languages: int 
     number_of_production_companies: int
     number_of_production_countries: int
+    A: int
+    B: int
+    C: int
+    D: int
+    E: int
+    F: int
+    G: int
+    H: int
+    I: int
+    J: int
+    K: int
+    L: int
+    M: int
+    N: int
+    O: int
+    P: int
+    Q: int
+    R: int
+    S: int
 
 app = FastAPI()
 
@@ -33,6 +58,44 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+shap_columns = ['vote_average', 'vote_count', 'runtime', 'budget', 'original_language',
+               'popularity', 'number_of_production_companies',
+               'number_of_production_countries', 'number_of_spoken_languages',
+               'release_month', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+               'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
+
+original_language_dict = {
+    "en": 1,
+    "es": 2,
+    "fr": 3,
+    "hi": 4,
+    "ja": 5,
+    "ru": 6,
+    "others": 0
+}
+
+genre_dict = {
+    'Action': 'A',
+    'Adventure': 'B',
+    'Animation': 'C',
+    'Comedy': 'D', 
+    'Crime': 'E',
+    'Documentary': 'F',
+    'Drama': 'G',
+    'Family': 'H',
+    'Fantasy': 'I',
+    'History': 'J',
+    'Horror': 'K',
+    'Music': 'L',
+    'Mystery': 'M',
+    'Romance': 'N',
+    'Science Fiction': 'O',
+    'TV Movie': 'P',
+    'Thriller': 'Q',
+    'War': 'R',
+    'Western': 'S',
+}
 
 @app.get("/movies")
 async def get_movies(title:str = "", last_id = None):
@@ -51,23 +114,37 @@ async def get_movies(title:str = "", last_id = None):
 async def get_analytics_for_move(movie_id: int):
     exec = cursor.execute("SELECT * FROM movies WHERE id = ?", (movie_id, ))
     movie = exec.fetchone()
-    return pd.DataFrame([dict(movie)])
+    explainer = shap.TreeExplainer(model)
+    movie_df_row = pd.DataFrame([dict(movie)])
+    movie_df_row = movie_df_row[shap_columns]
+    shap_values = explainer(movie_df_row)
+
+    ret_value = dict(movie)
+    ret_value['shap_values'] = dict(zip(shap_columns, shap_values.values[0].tolist()))
+    ret_value['base_value'] = explainer.expected_value.tolist()[0]
+
+    return ret_value
 
 @app.post("/predict")
 async def predict(movie: Movie):
     movie_dict = dict(movie);
-    input_df = pd.DataFrame([movie_dict])
-    predictions_df = predict_model(estimator=model, data=input_df)
-    # metrics = cursor.execute("SELECT * FROM metrics")
-    # metrics_row = metrics.fetchone()
+    row = {};
+    for shap_column in shap_columns:
+        if shap_column == 'original_language':
+            row[shap_column] = original_language_dict[movie_dict[shap_column]]
+        else:
+            row[shap_column] = movie_dict[shap_column]
+
+    input_df = pd.DataFrame([row])
+    predictions_df = model.predict(input_df)
 
     budget = movie.budget;
-    budget_upper_limit = budget * 2;
-    budget_lower_limit = budget / 2;
+    budget_upper_limit = budget * 4;
+    budget_lower_limit = budget / 4;
 
     vote_average = movie.vote_average;
-    vote_average_upper_limit = vote_average + 2;
-    vote_average_lower_limit = vote_average - 2;
+    vote_average_upper_limit = vote_average + 4;
+    vote_average_lower_limit = vote_average - 4;
 
     similar_movies_q = cursor.execute(f'''SELECT * FROM movies
                                           WHERE vote_average BETWEEN {vote_average_lower_limit} AND {vote_average_upper_limit} 
@@ -77,7 +154,7 @@ async def predict(movie: Movie):
 
     similar_movies = similar_movies_q.fetchall()
 
-    return {'predicted_revenue': predictions_df.iloc[0]['prediction_label'], 'similar_movies': similar_movies}
+    return {'predicted_revenue': predictions_df.tolist()[0], 'similar_movies': similar_movies}
 
 @app.get("/exploration")
 async def get_exploration(x_param: str, genres = None):
@@ -85,10 +162,13 @@ async def get_exploration(x_param: str, genres = None):
     where_clause = "";
     if (genres):
         genres = genres.split(", ")
-        genres = map(lambda genre: f"genres LIKE '%{genre}%'", genres)
-        where_clause = " WHERE " + (" AND ").join(genres)
+        print(genres)
+        genres = map(lambda genre: f"{genre_dict[genre]} = 1", genres)
+        print(genres)
+        where_clause = " WHERE " + (" OR ").join(genres)
+        print(where_clause)
 
-    pairs_q = f"SELECT {x_param} as x, revenue as y FROM MOVIES" + where_clause + " LIMIT 10000"
+    pairs_q = f"SELECT {x_param} as x, revenue as y FROM MOVIES" + where_clause
     pairs_q_exec = cursor.execute(pairs_q)
     pairs = pairs_q_exec.fetchall();
 

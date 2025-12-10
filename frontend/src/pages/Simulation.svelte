@@ -1,19 +1,20 @@
 <script lang="ts">
-  import Button from "$lib/components/ui/button/button.svelte";
-  import RotateCCW from "@lucide/svelte/icons/rotate-ccw";
   import ArrowDown from "@lucide/svelte/icons/arrow-down";
   import ArrowUp from "@lucide/svelte/icons/arrow-up";
+  import Button from "$lib/components/ui/button/button.svelte";
   import Dropdown from "$lib/components/ui/dropdown/Dropdown.svelte";
   import Input from "$lib/components/ui/input/input.svelte";
   import MaskedInput from "$lib/components/ui/masked-input/MaskedInput.svelte";
   import MultiDropdown from "$lib/components/ui/multi-dropdown/MultiDropdown.svelte";
+  import RotateCCW from "@lucide/svelte/icons/rotate-ccw";
   import TriangleAlert from "@lucide/svelte/icons/triangle-alert";
   import { API_URL } from "../const/const";
+  import { convert_form_to_body } from "../types/types";
   import { currency_formatter } from "./reuse";
   import { fade, fly } from 'svelte/transition';
   import { form } from "./states.svelte";
   import { navigate, route } from "../router";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
 
   let genre_options: Record<string, string> = {
     'A': 'Action',
@@ -121,22 +122,28 @@
   let original_bar!: HTMLElement;
   let simulated_bar!: HTMLElement;
 
-  $effect(() => {
-    if (!revenue_diff || !updated_predicted_revenue) {
+  function update_bar_height() {
+    console.log(revenue_diff, updated_predicted_revenue);
+    if (revenue_diff == null && revenue_diff == undefined && updated_predicted_revenue == null && updated_predicted_revenue == undefined) {
       return;
     }
+    console.log('run');
     let original_ratio;
     let simulated_ratio;
+
     if (revenue_diff < 0) {
       original_ratio = 1; 
       simulated_ratio = updated_predicted_revenue / initial_predicted_value;
-    } else {
+    } else if (revenue_diff > 0) {
       simulated_ratio = 1;
       original_ratio = initial_predicted_value / updated_predicted_revenue;
+    } else {
+      simulated_ratio = 1;
+      original_ratio = 1;
     }
     original_bar.style.height = `${Math.round(original_ratio * 100)}%`;
     simulated_bar.style.height = `${Math.round(simulated_ratio * 100)}%`;
-  });
+  }
 
   onMount(async () => {
     if (!Object.keys(form).length) {
@@ -170,14 +177,17 @@
     original_bar.style.height = "100%";
     revenue_diff = 0;
     updated_predicted_revenue = 0;
+    update_bar_height();
   }
 
   async function update_prediction() {
+    await tick();
+
     if (check_for_errors()) {
       return;
     }
 
-    const body = {
+    const form = {
       vote_count,
       vote_average,
       budget: Number(budget),
@@ -192,6 +202,8 @@
       predicted_revenue,
     }
 
+    const body = convert_form_to_body(form);
+
     const res = await fetch(`${API_URL}/predict`, {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
@@ -202,6 +214,7 @@
     updated_predicted_revenue = new_prediction.predicted_revenue;
     predicted_revenue = updated_predicted_revenue!;
     revenue_diff = updated_predicted_revenue! - initial_predicted_value;
+    update_bar_height();
   }
 </script>
 

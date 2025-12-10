@@ -108,8 +108,8 @@
         <div style="flex: 7; display: flex; flex-direction: column; gap: 12px; color: #fff">
             <h1 style="font-weight: 700; font-size: 1.5rem; line-height: calc(2 / 1.5)" id="title">${movie.original_title} <span class="text-gray-2">(${extract_release_year(movie.release_date)})</span></h1>
             <div style="display: flex; font-size: 0.875rem; line-height: calc(1.25 / 0.875)">
-              <span>${reformat_date(movie.release_date)} (${movie.original_language.toUpperCase()})</span>
-              <span class="pl-6 relative before:content-['•'] before:absolute before:left-2">${movie.genres}</span>
+              <span>${reformat_date(movie.release_date)} (${get_original_language(movie.original_language)})</span>
+              <span class="pl-6 relative before:content-['•'] before:absolute before:left-2">${get_genres(movie.genres)}</span>
               <span class="pl-6 relative before:content-['•'] before:absolute before:left-2">${reformat_time(movie?.runtime as number)}</span>
             </div>
             <h3 style="font-weight: 700; font-size: 1.25rem; line-height: calc(1.75 / 1.25)">Overview</h3>
@@ -123,6 +123,59 @@
 
   function mouse_leave() {
     div.remove();
+  }
+
+  const genres_map: Record<string, string> = {
+    'A': 'Action',
+    'B': 'Adventure',
+    'C': 'Animation',
+    'D': 'Comedy', 
+    'E': 'Crime',
+    'F': 'Documentary',
+    'G': 'Drama',
+    'H': 'Family',
+    'I': 'Fantasy',
+    'J': 'History',
+    'K': 'Horror',
+    'L': 'Music',
+    'M': 'Mystery',
+    'N': 'Romance',
+    'O': 'Science Fiction',
+    'P': 'TV Movie',
+    'Q': 'Thriller',
+    'R': 'War',
+    'S': 'Western'
+  }
+
+  const get_genres = (genres: string) => {
+    if (!genres) return "";
+    return eval(genres).map(g => genres_map[g]).join(", ");
+  };
+
+  const original_language_map: Record<number, string> = {
+    1: "en",
+    0: "",
+    4: "hi",
+    3: "fr",
+    6: "ru",
+    2: "es",
+    5: "ja"
+  }
+
+  const get_original_language = (id: number) => {
+    if (!id) return "";
+    return original_language_map[id] ?? "";
+  }
+
+  const verdict_color_map: Record<string, string> = {
+    "Blockbuster": "text-light-green",
+    "Moderate Hit": "text-light-blue",
+    "Break-even": "text-gray-2",
+    "Flop": "text-light-red"
+  }
+
+  function getVerdictTextColor(verdict: string) {
+    return verdict_color_map[verdict];
   }
 </script>
 
@@ -156,7 +209,7 @@
         {#if loading}
           <Skeleton class="h-10 w-2/3 bg-light-gray"/>
         {:else}
-          <p class="text-4xl font-extrabold text-light-blue">{verdict}</p>
+          <p class="text-4xl font-extrabold {getVerdictTextColor(verdict)}">{verdict}</p>
         {/if}
       </Card.Content>
     </Card.Root>
@@ -204,8 +257,8 @@
         {#each prediction?.similar_movies as movie}
           <tr class="border border-blue-gray-2 bg-dark-gray-3 hover:bg-dark-gray-2 hover:cursor-pointer font-light" onclick={row_click(movie)} onmouseenter={(e) => mouse_enter(e, movie)} onmouseleave={mouse_leave}>
             <td class="px-4 py-5">{movie.original_title}</td>
-            <td class="px-4 py-5">{movie.genres}</td>
-            <td class="px-4 py-5 text-right">{currency_formatter.format(movie.revenue)}</td>
+            <td class="px-4 py-5">{get_genres(movie.genres)}</td>
+            <td class="px-4 py-5 text-right font-extrabold">{currency_formatter.format(movie.revenue)}</td>
             <td class="px-4 py-5 text-right">{movie.vote_average.toFixed(2)}</td>
             <td class="px-4 py-5 text-right">{movie.vote_count}</td>
             <td class="px-4 py-5 text-right">{currency_formatter.format(movie.budget)}</td>
