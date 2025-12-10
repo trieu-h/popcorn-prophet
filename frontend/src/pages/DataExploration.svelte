@@ -37,6 +37,7 @@
   let chartElem: HTMLCanvasElement;
   let chartInstance: Chart;
   let exploration = $state<Exploration | null>(null);
+  let x_param_value: string = "budget";
 
   const trendline = {
     colorMin: "red",
@@ -62,7 +63,11 @@
     ticks: {
       color: '#FFFFFF',
       callback: (value: number, _index: number, _ticks: any[]) => {
-        return currency_formatter.format(value);
+        if (x_param_value === 'budget') {
+          return currency_formatter.format(value);
+        } else {
+          return value;
+        }
       }
     }
   }
@@ -143,6 +148,7 @@
   }
 
   async function onParameterChange(x_param: string) {
+    x_param_value = x_param;
     config.options.scales.x.title.text = parameter_options[x_param];
     updateChart();
   }
