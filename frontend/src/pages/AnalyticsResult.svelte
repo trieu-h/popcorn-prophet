@@ -3,7 +3,7 @@
   import ArrowLeft from "@lucide/svelte/icons/arrow-left";
   import type { MovieAnalytics } from "src/types/types";
   import { Button } from "$lib/components/ui/button/index.js";
-  import { POSTER_PREFIX } from "../const/const";
+  import { API_URL, POSTER_PREFIX } from "../const/const";
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
   import { currency_formatter } from "./reuse";
   import { onDestroy, onMount } from "svelte";
@@ -18,23 +18,18 @@
   }
 
   onMount(async () => {
-    // if (route.state) {
-    //   movie = route.state as Movie;
-    // } else {
-      loading = true;
-      const res = await fetch(`http://localhost:8000/analytics/${route.params.movie_id}`)
-      movie = await res.json();
-      let sum = 0;
-      for (const [shap_key, shap_value] of Object.entries(movie?.shap_values!)) {
-        if ("A" <= shap_key && shap_key <= "S") {
-          sum += shap_value;
-          delete movie?.shap_values[shap_key];
-        }
+    loading = true;
+    const res = await fetch(`${API_URL}/analytics/${route.params.movie_id}`)
+    movie = await res.json();
+    let sum = 0;
+    for (const [shap_key, shap_value] of Object.entries(movie?.shap_values!)) {
+      if ("A" <= shap_key && shap_key <= "S") {
+        sum += shap_value;
+        delete movie?.shap_values[shap_key];
       }
-      movie.shap_values['genres'] = sum;
-      loading = false;
-      console.log(movie)
-    // }
+    }
+    movie.shap_values['genres'] = sum;
+    loading = false;
     const main = document.body.querySelector('div#app main');
     backdrop_dom_node = document.createElement('div');
     backdrop_dom_node.style = `position: absolute; width: 100%; height: 300px; z-index: -1`;
