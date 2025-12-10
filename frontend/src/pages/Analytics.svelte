@@ -88,6 +88,7 @@
   onDestroy(() => {
     window.removeEventListener("scroll", scrollListener);
     window.removeEventListener("beforeunload", beforeUnloadListener);
+    analytics_state.show_back_to_top_button = false;
   })
 </script>
 
