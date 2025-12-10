@@ -10,6 +10,10 @@
   import { form } from "./states.svelte";
   import { navigate } from "../router";
   import { onMount } from "svelte";
+  import pepe_band from "../assets/pepe-band.gif";
+  import pepe_dancing from "../assets/pepe-dancing.gif";
+  import pepe_what from "../assets/pepe-what.gif";
+  import pepe_cry from "../assets/pepe-cry.gif";
 
   let prediction = $state<Prediction>();
   let verdict = $state<string>('');
@@ -153,13 +157,13 @@
   };
 
   const original_language_map: Record<number, string> = {
-    1: "en",
     0: "",
-    4: "hi",
-    3: "fr",
-    6: "ru",
+    1: "en",
     2: "es",
-    5: "ja"
+    3: "fr",
+    4: "hi",
+    5: "ja",
+    6: "ru"
   }
 
   const get_original_language = (id: number) => {
@@ -209,7 +213,18 @@
         {#if loading}
           <Skeleton class="h-10 w-2/3 bg-light-gray"/>
         {:else}
-          <p class="text-4xl font-extrabold {getVerdictTextColor(verdict)}">{verdict}</p>
+          <div class="flex gap-3">
+            <p class="text-4xl font-extrabold {getVerdictTextColor(verdict)}">{verdict}</p>
+            {#if verdict === "Blockbuster" }
+              <img src={pepe_band} class="h-[70px] mt-[-20px]"/>
+            {:else if verdict === "Moderate Hit" }
+              <img src={pepe_dancing} class="h-[70px] mt-[-20px]"/>
+            {:else if verdict === "Break-even" }
+              <img src={pepe_what} class="h-[50px] mt-[-10px]"/>
+            {:else if verdict === "Flop" }
+              <img src={pepe_cry} class="h-[50px] mt-[-10px]"/>
+            {/if}
+          </div>
         {/if}
       </Card.Content>
     </Card.Root>
