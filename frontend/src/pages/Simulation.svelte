@@ -227,7 +227,7 @@
   </div>
 
   <div class="flex flex-col md:flex-row justify-between gap-8 mb-5">
-    <div class="bg-dark-blue-3 border border-blue-gray-2 rounded-xl flex flex-col flex-7/20 p-5 pb-6">
+    <div class="bg-dark-blue-3 border border-blue-gray-2 rounded-xl flex flex-col flex-7/20 p-5 pb-6 min-w-0">
       <div class="flex justify-between items-center mb-5">
         <h1 class="text-2xl text-white font-bold">Adjust Variables</h1>
         <Button class="text-gray-2" variant="ghost" onclick={reset_all}>
