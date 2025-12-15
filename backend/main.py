@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pycaret.regression import setup, load_model, predict_model
 from pydantic import BaseModel
-from typing import List
 import joblib
 import pandas as pd
 import shap
@@ -12,10 +10,6 @@ conn = sqlite3.connect('movies.db')
 conn.row_factory = sqlite3.Row
 cursor = conn.cursor()
 
-# model._memory_full_transform.store_backend.location="./cache"
-# model = load_model('../data-analysis/et_movie_revenue')
-movies = pd.read_csv("../data-analysis/movies_cleaned.csv")
-setup(movies, target='revenue', session_id = 123)
 model = joblib.load("../data-analysis/scikit-learn-extra-tree-model.pkl")
 
 class Movie(BaseModel):
