@@ -2,6 +2,7 @@
   import ArrowDown from "@lucide/svelte/icons/arrow-down";
   import ArrowUp from "@lucide/svelte/icons/arrow-up";
   import Button from "$lib/components/ui/button/button.svelte";
+  import CircleQuestionMark from "@lucide/svelte/icons/circle-question-mark";
   import Dropdown from "$lib/components/ui/dropdown/Dropdown.svelte";
   import Input from "$lib/components/ui/input/input.svelte";
   import MaskedInput from "$lib/components/ui/masked-input/MaskedInput.svelte";
@@ -302,7 +303,7 @@
       </div>
 
       <div class="flex gap-4 mb-8">
-        <div class="flex-1 relative">
+        <div class="flex-1 relative flex flex-col gap-2">
           <label class="text-white">Vote Count</label>
           <Input bind:value={vote_count} bind:errs={vote_count_errs} bind:is_dirty={is_vote_count_dirty} required={true} type="number" onblur={update_prediction}/>
           {#if is_vote_count_dirty}
@@ -314,8 +315,10 @@
             {/each}
           {/if}
         </div>
-        <div class="flex-1 relative">
+
+        <div class="flex-1 relative flex flex-col gap-2">
           <label class="text-white">Vote Average</label>
+
           <Input min=0 max=10 type="number" bind:value={vote_average} bind:is_dirty={vote_average_dirty} bind:errs={vote_average_errs} required={true} onblur={update_prediction}/>
           {#if vote_average_dirty}
             {#each Object.values(vote_average_errs) as errMsg}
@@ -330,6 +333,7 @@
 
       <div class="flex flex-col gap-2 mb-8 relative">
         <label class="text-white">Original Language</label>
+
         <Dropdown bind:value={original_language} bind:errs={original_language_errs} bind:is_dirty={is_original_language_dirty} options={original_language_options} required={true} on_value_change={update_prediction}/>
         {#if is_original_language_dirty}
           {#each Object.values(original_language_errs) as errMsg}
@@ -344,6 +348,7 @@
       <div class="flex gap-4">
         <div class="flex-1 flex flex-col gap-2 relative">
           <label class="text-white"># Languages</label>
+
           <Input bind:value={number_of_spoken_languages} bind:is_dirty={is_number_of_spoken_languages_dirty} bind:errs={number_of_language_errs} required={true} type="number" onblur={update_prediction}/>
           {#if is_number_of_spoken_languages_dirty}
             {#each Object.values(number_of_language_errs) as errMsg}
@@ -355,6 +360,7 @@
         </div>
         <div class="flex-1 flex flex-col gap-2 relative">
           <label class="text-white"># Prod. Comp.</label>
+
           <Input bind:value={number_of_production_companies} bind:is_dirty={is_number_of_production_companies_dirty} bind:errs={number_of_production_companies_errs} required={true} type="number" onblur={update_prediction}/>
           {#if is_number_of_production_companies_dirty}
             {#each Object.values(number_of_production_companies_errs) as errMsg}
@@ -363,9 +369,11 @@
               </div>
             {/each}
           {/if}
-          </div>
+        </div>
+
         <div class="flex-1 flex flex-col gap-2 relative">
           <label class="text-white"># Prod. Count.</label>
+
           <Input bind:value={number_of_production_countries} bind:is_dirty={is_number_of_production_countries_dirty} bind:errs={number_of_production_countries_errs} required={true} type="number" onblur={update_prediction}/>
           {#if is_number_of_production_countries_dirty}
             {#each Object.values(number_of_production_countries_errs) as errMsg}

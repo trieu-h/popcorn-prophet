@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { Router } from 'sv-router';
-  import { isActiveLink } from 'sv-router';
-  import logo from './assets/logo.png'
   import './router.ts';
-  import { Button } from "$lib/components/ui/button/index.js";
+  import * as Tooltip from "$lib/components/ui/tooltip/index.js";
   import ArrowUp from "@lucide/svelte/icons/arrow-up";
+  import logo from './assets/logo.png'
+  import { Button } from "$lib/components/ui/button/index.js";
+  import { Router } from 'sv-router';
   import { analytics_state } from "./pages/states.svelte";
+  import { isActiveLink } from 'sv-router';
 
   function go_to_top_of_page() {
     window.scrollTo({top: 0, behavior: "smooth"});
@@ -25,7 +26,9 @@
       </ul>
     </header>
 
-    <Router></Router>
+    <Tooltip.Provider>
+      <Router></Router>
+    </Tooltip.Provider>
 
     <div id="overlay" class="fixed top-0 left-0 h-full w-full pointer-events-none">
       <Button 
