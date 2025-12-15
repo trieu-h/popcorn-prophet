@@ -75,6 +75,31 @@ original_language_dict = {
     "others": 0
 }
 
+name_original_language_dict = {
+    1: "English",
+    2: "Spanish",
+    3: "French",
+    4: "Hindi",
+    5: "Japanese",
+    6: "Russian",
+    0: "Others"
+}
+
+month_map_dict = {
+    1: "January",
+    2: "February",
+    3: "March",
+    4: "April",
+    5: "May",
+    6: "June",
+    7: "July",
+    8: "August",
+    9: "September",
+    10: "October",
+    11: "November",
+    12: "December"
+}
+
 genre_dict = {
     'Action': 'A',
     'Adventure': 'B',
@@ -195,3 +220,42 @@ async def get_exploration(x_param: str, genres = None):
         "average_budget": average_budget,
         "highest_revenue": highest_revenue
     }
+
+@app.get("/exploration-pie")
+async def get_exploration_pie():
+    exec = cursor.execute("SELECT original_language, COUNT(*) FROM movies GROUP BY original_language")
+    temp = exec.fetchall()
+    count_dict = dict(temp)
+
+    sum = 0;
+    for language, count in count_dict.items():
+        sum += count
+
+    for language, count in count_dict.items():
+        count_dict[language] = count / sum * 100
+
+    mapped_labels = list(map(lambda k: name_original_language_dict[k], list(count_dict.keys())))
+
+    return {
+        "labels": mapped_labels,
+        "data": list(count_dict.values())
+    }
+
+@app.get("/exploration-bar")
+async def get_exploration_bar(x_param: str):
+    exec = cursor.execute(f"SELECT {x_param}, AVG(revenue) FROM movies GROUP BY {x_param}")
+    temp = exec.fetchall()
+    revenue_dict = dict(temp)
+
+    labels = list(revenue_dict.keys())
+    if (x_param == "original_language"):
+        labels = list(map(lambda k: name_original_language_dict[k], labels))
+    elif x_param == 'release_month':
+        labels = list(map(lambda k: month_map_dict[k], labels))
+
+    return {
+        "labels": labels,
+        "data": list(revenue_dict.values())
+    }
+
+

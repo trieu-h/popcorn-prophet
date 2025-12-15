@@ -128,6 +128,16 @@ export type Exploration = {
   highest_revenue: number;
 }
 
+export type Pie = {
+  labels: Array<string>;
+  data: Array<number>;
+}
+
+export type Bar = {
+  labels: Array<string>;
+  data: Array<number>;
+}
+
 export type MovieAnalytics = {
   id: number;
   adult: string; // "True" | False" -> Probably fine for now
